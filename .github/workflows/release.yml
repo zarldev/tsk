@@ -61,3 +61,72 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release create ${{ github.ref_name }} artifacts/* --generate-notes
+
+  update-tap:
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+      - name: Update Homebrew formula
+        env:
+          TAP_TOKEN: ${{ secrets.TAP_TOKEN }}
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+
+          # compute checksums
+          DARWIN_AMD64=$(sha256sum artifacts/tsk-darwin-amd64.tar.gz | cut -d' ' -f1)
+          DARWIN_ARM64=$(sha256sum artifacts/tsk-darwin-arm64.tar.gz | cut -d' ' -f1)
+          LINUX_AMD64=$(sha256sum artifacts/tsk-linux-amd64.tar.gz | cut -d' ' -f1)
+          LINUX_ARM64=$(sha256sum artifacts/tsk-linux-arm64.tar.gz | cut -d' ' -f1)
+
+          # clone tap
+          git clone https://x-access-token:${TAP_TOKEN}@github.com/zarldev/homebrew-tap.git tap
+          cd tap
+
+          # generate formula from scratch
+          cat > Formula/tsk.rb << FORMULA
+          class Tsk < Formula
+            desc "Simple CLI task tracker"
+            homepage "https://zarldev.github.io/tsk/"
+            version "${VERSION}"
+            license "MIT"
+
+            on_macos do
+              if Hardware::CPU.arm?
+                url "https://github.com/zarldev/tsk/releases/download/v${VERSION}/tsk-darwin-arm64.tar.gz"
+                sha256 "${DARWIN_ARM64}"
+              else
+                url "https://github.com/zarldev/tsk/releases/download/v${VERSION}/tsk-darwin-amd64.tar.gz"
+                sha256 "${DARWIN_AMD64}"
+              end
+            end
+
+            on_linux do
+              if Hardware::CPU.arm?
+                url "https://github.com/zarldev/tsk/releases/download/v${VERSION}/tsk-linux-arm64.tar.gz"
+                sha256 "${LINUX_ARM64}"
+              else
+                url "https://github.com/zarldev/tsk/releases/download/v${VERSION}/tsk-linux-amd64.tar.gz"
+                sha256 "${LINUX_AMD64}"
+              end
+            end
+
+            def install
+              bin.install "tsk"
+            end
+
+            test do
+              assert_match "tsk", shell_output("#{bin}/tsk version")
+            end
+          end
+          FORMULA
+
+          # commit and push
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add Formula/tsk.rb
+          git commit -m "update tsk to ${VERSION}"
+          git push

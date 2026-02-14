@@ -10,6 +10,14 @@ A simple CLI task tracker with zero dependencies.
 
 ## Install
 
+### Homebrew
+
+```bash
+brew install zarldev/tap/tsk
+```
+
+### Go
+
 ```bash
 go install github.com/zarldev/tsk/cmd/tsk@latest
 ```

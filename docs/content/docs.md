@@ -37,6 +37,14 @@ task 1 removed
 
 ## install
 
+### homebrew (macOS/Linux)
+
+```
+$ brew install zarldev/tap/tsk
+```
+
+### go install
+
 you need [Go](https://go.dev/dl/) 1.23 or later.
 
 ```
