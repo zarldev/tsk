@@ -1,0 +1,58 @@
+// Landing page styles
+
+.book-hero {
+  text-align: center;
+  padding: 4rem 1rem 2rem;
+
+  h1 {
+    font-size: 4em;
+    margin-bottom: 0.25em;
+    letter-spacing: -0.02em;
+  }
+
+  > p:first-of-type {
+    font-size: 1.25rem;
+    opacity: 0.8;
+    margin-bottom: 2rem;
+  }
+
+  .highlight {
+    display: inline-block;
+    text-align: left;
+    margin-bottom: 2rem;
+
+    pre {
+      font-size: 1rem;
+      padding: 0.75rem 2rem;
+    }
+  }
+
+  a.book-btn {
+    margin: 0 0.5rem;
+  }
+}
+
+.landing-features {
+  max-width: 56rem;
+  margin: 2rem auto;
+  padding: 0 1rem;
+
+  .book-card .markdown-inner h3 {
+    margin-top: 0.5rem;
+  }
+}
+
+.landing-demo {
+  max-width: 40rem;
+  margin: 2rem auto 4rem;
+  padding: 0 1rem;
+
+  h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .highlight pre {
+    font-size: 0.9rem;
+  }
+}
