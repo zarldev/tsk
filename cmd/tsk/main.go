@@ -62,6 +62,8 @@ func main() {
 		cmdExport(store)
 	case "config":
 		cmdConfig(cfg)
+	case "completion":
+		cmdCompletion()
 	case "version":
 		fmt.Printf("tsk %s\n", version)
 	default:
@@ -440,6 +442,7 @@ commands:
   clear                        remove all done tasks
   export [--done|--pending]    export tasks as markdown
   config                       show current configuration
+  completion <bash|zsh|fish>   generate shell completions
   version                      print version`)
 }
 

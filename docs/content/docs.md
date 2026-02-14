@@ -6,7 +6,7 @@ title: "docs"
 
 - [demo](#demo)
 - [install](#install)
-- [commands](#commands) -- [show](#show) / [add](#add) / [list (ls)](#list) / [done](#done) / [edit](#edit) / [rm](#rm) / [clear](#clear) / [export](#export) / [config](#config) / [version](#version)
+- [commands](#commands) -- [show](#show) / [add](#add) / [list (ls)](#list) / [done](#done) / [edit](#edit) / [rm](#rm) / [clear](#clear) / [export](#export) / [config](#config) / [completion](#completion) / [version](#version)
 - [priority](#priority)
 - [configuration](#configuration)
 - [storage](#storage)
@@ -301,6 +301,40 @@ pipe to create a config file:
 ```
 $ tsk config > ~/.config/tsk/config.toml
 ```
+
+### completion
+
+generate shell completion scripts. the script is printed to stdout so you can eval it in your shell config.
+
+```
+tsk completion <bash|zsh|fish>
+```
+
+#### bash
+
+add to `~/.bashrc`:
+
+```
+eval "$(tsk completion bash)"
+```
+
+#### zsh
+
+add to `~/.zshrc`:
+
+```
+eval "$(tsk completion zsh)"
+```
+
+#### fish
+
+add to `~/.config/fish/config.fish`:
+
+```
+tsk completion fish | source
+```
+
+completions cover subcommands, flags (`--done`, `--pending`, `-p`), priority values (`low`, `medium`, `high`), shell names for `completion`, and task IDs for `done`, `rm`, and `edit` (fetched dynamically via `tsk list`).
 
 ### version
 

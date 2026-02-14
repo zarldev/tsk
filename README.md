@@ -25,6 +25,7 @@ go install github.com/zarldev/tsk/cmd/tsk@latest
 ## Features
 
 - colored output (respects `NO_COLOR`)
+- shell completions for bash, zsh, and fish
 - configurable via `~/.config/tsk/config.toml`
 - storage backends: local file (default), GitHub Gist
 - zero dependencies
@@ -46,6 +47,7 @@ tsk clear                      # remove all done tasks
 tsk export                     # export tasks as markdown
 tsk export --pending           # export only pending tasks
 tsk config                     # print current config
+tsk completion bash            # generate bash completions
 tsk version                    # print version
 ```
 
