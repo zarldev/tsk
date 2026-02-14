@@ -19,10 +19,10 @@ title: "docs"
 $ tsk add "buy milk"
 added task 1: buy milk
 
-$ tsk add -p high "urgent fix"
+$ tsk add -p h "urgent fix"
 added task 2: urgent fix
 
-$ tsk add -p medium "review PR"
+$ tsk add -p m "review PR"
 added task 3: review PR
 
 $ tsk list
@@ -111,19 +111,19 @@ the `priority:` line only appears for tasks that have a priority set (low, mediu
 create a new task, optionally with a priority level.
 
 ```
-tsk add [-p <priority>] <title>
+tsk add [-p h|m|l] <title>
 ```
 
-the title should be quoted if it contains spaces. each task gets an auto-incrementing ID. the `-p` flag sets the priority: `low`, `medium`, or `high`. if omitted, the task has no priority.
+the title should be quoted if it contains spaces. each task gets an auto-incrementing ID. the `-p` flag sets the priority: `h` (high), `m` (medium), or `l` (low). full names also accepted. if omitted, the task has no priority.
 
 ```
 $ tsk add "buy milk"
 added task 1: buy milk
 
-$ tsk add -p high "urgent fix"
+$ tsk add -p h "urgent fix"
 added task 2: urgent fix
 
-$ tsk add -p low "someday"
+$ tsk add -p l "someday"
 added task 3: someday
 ```
 
@@ -349,16 +349,16 @@ tsk v0.2.0
 
 ## priority
 
-tasks can have an optional priority level: `low`, `medium`, or `high`. set it when adding a task with the `-p` flag:
+tasks can have an optional priority level: `h` (high), `m` (medium), or `l` (low). set it when adding a task with the `-p` flag:
 
 ```
-$ tsk add -p high "deploy hotfix"
+$ tsk add -p h "deploy hotfix"
 added task 1: deploy hotfix
 
-$ tsk add -p medium "review PR"
+$ tsk add -p m "review PR"
 added task 2: review PR
 
-$ tsk add -p low "update docs"
+$ tsk add -p l "update docs"
 added task 3: update docs
 
 $ tsk add "buy milk"

@@ -34,7 +34,7 @@ go install github.com/zarldev/tsk/cmd/tsk@latest
 
 ```bash
 tsk add "buy milk"             # add a task
-tsk add -p high "urgent"       # add with priority (low, medium, high)
+tsk add -p h "urgent"          # add with priority (h=high, m=medium, l=low)
 tsk list                       # show all tasks
 tsk ls                         # same as list
 tsk 1                          # show task 1 details

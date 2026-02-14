@@ -13,10 +13,17 @@ const (
 )
 
 // ValidPriority checks whether s is a recognized priority level.
+// Accepts shorthand: h, m, l.
 func ValidPriority(s string) (Priority, bool) {
-	switch Priority(s) {
-	case PriorityNone, PriorityLow, PriorityMedium, PriorityHigh:
-		return Priority(s), true
+	switch s {
+	case "":
+		return PriorityNone, true
+	case "low", "l":
+		return PriorityLow, true
+	case "medium", "m":
+		return PriorityMedium, true
+	case "high", "h":
+		return PriorityHigh, true
 	default:
 		return "", false
 	}

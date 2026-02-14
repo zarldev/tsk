@@ -604,8 +604,11 @@ func TestValidPriority(t *testing.T) {
 	}{
 		{"", PriorityNone, true},
 		{"low", PriorityLow, true},
+		{"l", PriorityLow, true},
 		{"medium", PriorityMedium, true},
+		{"m", PriorityMedium, true},
 		{"high", PriorityHigh, true},
+		{"h", PriorityHigh, true},
 		{"critical", "", false},
 		{"urgent", "", false},
 		{"HIGH", "", false},

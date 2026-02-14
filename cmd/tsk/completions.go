@@ -28,7 +28,7 @@ const bashCompletion = `_tsk() {
             return
             ;;
         -p)
-            COMPREPLY=( $(compgen -W "low medium high" -- "$cur") )
+            COMPREPLY=( $(compgen -W "h m l high medium low" -- "$cur") )
             return
             ;;
         completion)
@@ -76,7 +76,7 @@ _tsk() {
             ;;
         add)
             if [[ "$words[CURRENT-1]" == "-p" ]]; then
-                compadd -- low medium high
+                compadd -- h m l high medium low
             elif [[ "$words[CURRENT]" == -* ]]; then
                 compadd -- -p
             fi

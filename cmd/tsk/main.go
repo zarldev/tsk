@@ -79,7 +79,7 @@ func main() {
 
 func cmdAdd(store task.Store, c color.Palette) {
 	if len(os.Args) < 3 {
-		fmt.Fprintln(os.Stderr, "usage: tsk add [-p <priority>] <title>")
+		fmt.Fprintln(os.Stderr, "usage: tsk add [-p h|m|l] <title>")
 		os.Exit(1)
 	}
 
@@ -93,7 +93,7 @@ func cmdAdd(store task.Store, c color.Palette) {
 		}
 		p, ok := task.ValidPriority(os.Args[3])
 		if !ok {
-			fmt.Fprintf(os.Stderr, "invalid priority: %s (use low, medium, high)\n", os.Args[3])
+			fmt.Fprintf(os.Stderr, "invalid priority: %s (use h, m, l)\n", os.Args[3])
 			os.Exit(1)
 		}
 		priority = p
@@ -434,7 +434,7 @@ func usage() {
 
 commands:
   <id>                         show task details
-  add [-p <priority>] <title>  add a new task (priority: low, medium, high)
+  add [-p h|m|l] <title>  add a new task (h=high, m=medium, l=low)
   list, ls [--done|--pending]  list tasks
   done <id>[,<id>,...]         mark tasks as done
   edit <id> <title>            rename a task
