@@ -58,6 +58,8 @@ func main() {
 		cmdRm(store, c)
 	case "clear":
 		cmdClear(store, c)
+	case "export":
+		cmdExport(store)
 	case "config":
 		cmdConfig(cfg)
 	case "version":
@@ -318,6 +320,43 @@ func cmdClear(store task.Store, c color.Palette) {
 		pluralize(removed, "task", "tasks"))
 }
 
+func cmdExport(store task.Store) {
+	f := task.FilterAll
+	if len(os.Args) > 2 {
+		switch os.Args[2] {
+		case "--done":
+			f = task.FilterDone
+		case "--pending":
+			f = task.FilterPending
+		default:
+			fmt.Fprintf(os.Stderr, "unknown flag: %s\n", os.Args[2])
+			os.Exit(1)
+		}
+	}
+
+	tasks, err := store.Load()
+	if err != nil {
+		fatal(err)
+	}
+
+	filtered := task.List(tasks, f)
+	if len(filtered) == 0 {
+		return
+	}
+
+	for _, t := range filtered {
+		check := " "
+		if t.Done {
+			check = "x"
+		}
+		line := fmt.Sprintf("- [%s] %s", check, t.Title)
+		if t.Priority != "" {
+			line += fmt.Sprintf(" (%s)", t.Priority)
+		}
+		fmt.Println(line)
+	}
+}
+
 func pluralize(n int, singular, plural string) string {
 	if n == 1 {
 		return singular
@@ -399,6 +438,7 @@ commands:
   edit <id> <title>            rename a task
   rm <id>[,<id>,...]           remove tasks
   clear                        remove all done tasks
+  export [--done|--pending]    export tasks as markdown
   config                       show current configuration
   version                      print version`)
 }
