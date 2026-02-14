@@ -15,38 +15,36 @@ title: "docs"
 
 ## demo
 
-```
-$ tsk add "buy milk"
-added task 1: buy milk
+<pre><code><span class="prompt">$</span> tsk add "buy milk"
+added task <span class="t-cyan">1</span>: buy milk
 
-$ tsk add -p h "urgent fix"
-added task 2: urgent fix
+<span class="prompt">$</span> tsk add -p h "urgent fix"
+added task <span class="t-cyan">2</span>: urgent fix
 
-$ tsk add -p m "review PR"
-added task 3: review PR
+<span class="prompt">$</span> tsk add -p m "review PR"
+added task <span class="t-cyan">3</span>: review PR
 
-$ tsk list
-  1    [ ] buy milk     (just now)
-  2 !! [ ] urgent fix   (just now)
-  3  ! [ ] review PR    (just now)
+<span class="prompt">$</span> tsk list
+<span class="t-cyan">  1</span>    [ ] buy milk     <span class="t-dim">(just now)</span>
+<span class="t-cyan">  2</span> <span class="t-red">!!</span> [ ] urgent fix   <span class="t-dim">(just now)</span>
+<span class="t-cyan">  3</span> <span class="t-yellow"> !</span> [ ] review PR    <span class="t-dim">(just now)</span>
 
-$ tsk done 1
-task 1 marked done
+<span class="prompt">$</span> tsk done 1
+task <span class="t-cyan">1</span> marked <span class="t-green">done</span>
 
-$ tsk list
-  1    [x] buy milk     (2m ago)
-  2 !! [ ] urgent fix   (2m ago)
-  3  ! [ ] review PR    (2m ago)
+<span class="prompt">$</span> tsk list
+<span class="t-cyan">  1</span>    <span class="t-green">[x]</span> <span class="t-dim-strike">buy milk</span>     <span class="t-dim">(2m ago)</span>
+<span class="t-cyan">  2</span> <span class="t-red">!!</span> [ ] urgent fix   <span class="t-dim">(2m ago)</span>
+<span class="t-cyan">  3</span> <span class="t-yellow"> !</span> [ ] review PR    <span class="t-dim">(2m ago)</span>
 
-$ tsk list --pending
-  2 !! [ ] urgent fix   (2m ago)
-  3  ! [ ] review PR    (2m ago)
+<span class="prompt">$</span> tsk list --pending
+<span class="t-cyan">  2</span> <span class="t-red">!!</span> [ ] urgent fix   <span class="t-dim">(2m ago)</span>
+<span class="t-cyan">  3</span> <span class="t-yellow"> !</span> [ ] review PR    <span class="t-dim">(2m ago)</span>
 
-$ tsk rm 1
-task 1 removed
-```
+<span class="prompt">$</span> tsk rm 1
+task <span class="t-cyan">1</span> removed</code></pre>
 
-output is colored in the terminal — task IDs in cyan, done checkmarks in green, completed tasks dimmed, `!!` in red for high priority, `!` in yellow for medium. disable with `NO_COLOR=1` or in config.
+output is colored in the terminal — task IDs in <span class="t-cyan">cyan</span>, done checkmarks in <span class="t-green">green</span>, completed tasks <span class="t-dim">dimmed</span>, <span class="t-red">!!</span> in red for high priority, <span class="t-yellow">!</span> in yellow for medium. disable with `NO_COLOR=1` or in config.
 
 ---
 
@@ -82,27 +80,25 @@ tsk <id>
 
 pass a task ID as the first argument (no subcommand needed).
 
-```
-$ tsk 3
-  id:        3
-  title:     buy milk
-  status:    pending
-  created:   2026-02-14 19:42:25 (3h ago)
+<pre><code><span class="prompt">$</span> tsk 3
+  <span class="t-dim">id:</span>        <span class="t-cyan">3</span>
+  <span class="t-dim">title:</span>     buy milk
+  <span class="t-dim">status:</span>    pending
+  <span class="t-dim">created:</span>   2026-02-14 19:42:25 <span class="t-dim">(3h ago)</span>
 
-$ tsk 2
-  id:        2
-  title:     urgent fix
-  priority:  high
-  status:    pending
-  created:   2026-02-14 19:42:25 (3h ago)
+<span class="prompt">$</span> tsk 2
+  <span class="t-dim">id:</span>        <span class="t-cyan">2</span>
+  <span class="t-dim">title:</span>     urgent fix
+  <span class="t-dim">priority:</span>  <span class="t-red">high</span>
+  <span class="t-dim">status:</span>    pending
+  <span class="t-dim">created:</span>   2026-02-14 19:42:25 <span class="t-dim">(3h ago)</span>
 
-$ tsk 1
-  id:        1
-  title:     write tests
-  status:    done
-  created:   2026-02-14 10:30:00 (12h ago)
-  completed: 2026-02-14 11:15:00 (11h ago)
-```
+<span class="prompt">$</span> tsk 1
+  <span class="t-dim">id:</span>        <span class="t-cyan">1</span>
+  <span class="t-dim">title:</span>     write tests
+  <span class="t-dim">status:</span>    <span class="t-green">done</span>
+  <span class="t-dim">created:</span>   2026-02-14 10:30:00 <span class="t-dim">(12h ago)</span>
+  <span class="t-dim">completed:</span> 2026-02-14 11:15:00 <span class="t-dim">(11h ago)</span></code></pre>
 
 the `priority:` line only appears for tasks that have a priority set (low, medium, or high). the `completed:` line only appears for tasks that have been marked done. if the task ID does not exist, `tsk` prints an error and exits with status 1.
 
@@ -116,16 +112,14 @@ tsk add [-p h|m|l] <title>
 
 the title should be quoted if it contains spaces. each task gets an auto-incrementing ID. the `-p` flag sets the priority: `h` (high), `m` (medium), or `l` (low). full names also accepted. if omitted, the task has no priority.
 
-```
-$ tsk add "buy milk"
-added task 1: buy milk
+<pre><code><span class="prompt">$</span> tsk add "buy milk"
+added task <span class="t-cyan">1</span>: buy milk
 
-$ tsk add -p h "urgent fix"
-added task 2: urgent fix
+<span class="prompt">$</span> tsk add -p h "urgent fix"
+added task <span class="t-cyan">2</span>: urgent fix
 
-$ tsk add -p l "someday"
-added task 3: someday
-```
+<span class="prompt">$</span> tsk add -p l "someday"
+added task <span class="t-cyan">3</span>: someday</code></pre>
 
 ### list
 
@@ -138,17 +132,13 @@ tsk ls [--done|--pending]
 
 show all tasks:
 
-```
-$ tsk list
-  1 [ ] buy milk  (just now)
-```
+<pre><code><span class="prompt">$</span> tsk list
+<span class="t-cyan">  1</span>    [ ] buy milk  <span class="t-dim">(just now)</span></code></pre>
 
 show only completed tasks:
 
-```
-$ tsk list --done
-  1 [x] buy milk  (2m ago)
-```
+<pre><code><span class="prompt">$</span> tsk list --done
+<span class="t-cyan">  1</span>    <span class="t-green">[x]</span> <span class="t-dim-strike">buy milk</span>  <span class="t-dim">(2m ago)</span></code></pre>
 
 show only pending tasks:
 
@@ -179,15 +169,13 @@ mark one or more tasks as completed. accepts a single ID or comma-separated IDs.
 tsk done <id>[,<id>,...]
 ```
 
-```
-$ tsk done 1
-task 1 marked done
+<pre><code><span class="prompt">$</span> tsk done 1
+task <span class="t-cyan">1</span> marked <span class="t-green">done</span>
 
-$ tsk done 1,3,5
-task 1 marked done
-task 3 marked done
-task 5 marked done
-```
+<span class="prompt">$</span> tsk done 1,3,5
+task <span class="t-cyan">1</span> marked <span class="t-green">done</span>
+task <span class="t-cyan">3</span> marked <span class="t-green">done</span>
+task <span class="t-cyan">5</span> marked <span class="t-green">done</span></code></pre>
 
 if an ID does not exist, `tsk` prints an error for that ID and continues with the rest. the exit status is non-zero if any ID was not found.
 
@@ -201,10 +189,8 @@ tsk edit <id> <title>
 
 the title should be quoted if it contains spaces.
 
-```
-$ tsk edit 1 "buy oat milk"
-task 1 updated: buy oat milk
-```
+<pre><code><span class="prompt">$</span> tsk edit 1 "buy oat milk"
+task <span class="t-cyan">1</span> updated: buy oat milk</code></pre>
 
 if the ID does not exist, `tsk` prints an error and exits with status 1.
 
@@ -216,14 +202,12 @@ remove one or more tasks permanently. accepts a single ID or comma-separated IDs
 tsk rm <id>[,<id>,...]
 ```
 
-```
-$ tsk rm 1
-task 1 removed
+<pre><code><span class="prompt">$</span> tsk rm 1
+task <span class="t-cyan">1</span> removed
 
-$ tsk rm 2,4
-task 2 removed
-task 4 removed
-```
+<span class="prompt">$</span> tsk rm 2,4
+task <span class="t-cyan">2</span> removed
+task <span class="t-cyan">4</span> removed</code></pre>
 
 this deletes the task from storage entirely. there is no undo. if an ID does not exist, `tsk` prints an error for that ID and continues with the rest.
 
@@ -235,13 +219,11 @@ remove all completed tasks in one operation.
 tsk clear
 ```
 
-```
-$ tsk clear
-cleared 3 done tasks
+<pre><code><span class="prompt">$</span> tsk clear
+cleared <span class="t-cyan">3</span> done tasks
 
-$ tsk clear
-no done tasks to clear
-```
+<span class="prompt">$</span> tsk clear
+no done tasks to clear</code></pre>
 
 this removes every task that has been marked done. pending tasks are left untouched. there is no confirmation prompt — use `tsk list --done` first to review what will be removed.
 
@@ -351,40 +333,34 @@ tsk v0.2.0
 
 tasks can have an optional priority level: `h` (high), `m` (medium), or `l` (low). set it when adding a task with the `-p` flag:
 
-```
-$ tsk add -p h "deploy hotfix"
-added task 1: deploy hotfix
+<pre><code><span class="prompt">$</span> tsk add -p h "deploy hotfix"
+added task <span class="t-cyan">1</span>: deploy hotfix
 
-$ tsk add -p m "review PR"
-added task 2: review PR
+<span class="prompt">$</span> tsk add -p m "review PR"
+added task <span class="t-cyan">2</span>: review PR
 
-$ tsk add -p l "update docs"
-added task 3: update docs
+<span class="prompt">$</span> tsk add -p l "update docs"
+added task <span class="t-cyan">3</span>: update docs
 
-$ tsk add "buy milk"
-added task 4: buy milk
-```
+<span class="prompt">$</span> tsk add "buy milk"
+added task <span class="t-cyan">4</span>: buy milk</code></pre>
 
-in the list view, high priority shows `!!` (red) and medium shows `!` (yellow). low and no-priority tasks have no indicator, keeping the list clean:
+in the list view, high priority shows <span class="t-red">!!</span> (red) and medium shows <span class="t-yellow">!</span> (yellow). low and no-priority tasks have no indicator, keeping the list clean:
 
-```
-$ tsk list
-  1 !! [ ] deploy hotfix  (just now)
-  2  ! [ ] review PR      (just now)
-  3    [ ] update docs    (just now)
-  4    [ ] buy milk       (just now)
-```
+<pre><code><span class="prompt">$</span> tsk list
+<span class="t-cyan">  1</span> <span class="t-red">!!</span> [ ] deploy hotfix  <span class="t-dim">(just now)</span>
+<span class="t-cyan">  2</span> <span class="t-yellow"> !</span> [ ] review PR      <span class="t-dim">(just now)</span>
+<span class="t-cyan">  3</span>    [ ] update docs    <span class="t-dim">(just now)</span>
+<span class="t-cyan">  4</span>    [ ] buy milk       <span class="t-dim">(just now)</span></code></pre>
 
 the detail view shows the priority for any task that has one set:
 
-```
-$ tsk 1
-  id:        1
-  title:     deploy hotfix
-  priority:  high
-  status:    pending
-  created:   2026-02-14 19:42:25 (just now)
-```
+<pre><code><span class="prompt">$</span> tsk 1
+  <span class="t-dim">id:</span>        <span class="t-cyan">1</span>
+  <span class="t-dim">title:</span>     deploy hotfix
+  <span class="t-dim">priority:</span>  <span class="t-red">high</span>
+  <span class="t-dim">status:</span>    pending
+  <span class="t-dim">created:</span>   2026-02-14 19:42:25 <span class="t-dim">(just now)</span></code></pre>
 
 tasks without a priority omit the `priority:` line entirely. existing tasks from before this feature load fine with no priority (backwards compatible).
 

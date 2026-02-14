@@ -222,6 +222,15 @@ pre code {
   user-select: none;
 }
 
+/* -- terminal output colors ------------------------------------------------ */
+
+.t-cyan { color: #56d4dd; font-weight: bold; }
+.t-green { color: #39d353; }
+.t-dim { color: #8b949e; }
+.t-dim-strike { color: #8b949e; text-decoration: line-through; }
+.t-red { color: #f85149; font-weight: bold; }
+.t-yellow { color: #d29922; font-weight: bold; }
+
 /* -- tables ---------------------------------------------------------------- */
 
 table {
