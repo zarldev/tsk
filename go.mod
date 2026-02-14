@@ -1,3 +1,3 @@
-module github.com/zarlbot/tsk
+module github.com/zarldev/tsk
 
 go 1.23
