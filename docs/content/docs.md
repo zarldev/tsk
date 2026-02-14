@@ -7,6 +7,7 @@ title: "docs"
 - [demo](#demo)
 - [install](#install)
 - [commands](#commands) -- [show](#show) / [add](#add) / [list (ls)](#list) / [done](#done) / [edit](#edit) / [rm](#rm) / [clear](#clear) / [config](#config) / [version](#version)
+- [priority](#priority)
 - [configuration](#configuration)
 - [storage](#storage)
 
@@ -18,23 +19,34 @@ title: "docs"
 $ tsk add "buy milk"
 added task 1: buy milk
 
+$ tsk add -p high "urgent fix"
+added task 2: urgent fix
+
+$ tsk add -p medium "review PR"
+added task 3: review PR
+
 $ tsk list
-  1 [ ] buy milk  (just now)
+  1    [ ] buy milk     (just now)
+  2 !! [ ] urgent fix   (just now)
+  3  ! [ ] review PR    (just now)
 
 $ tsk done 1
 task 1 marked done
 
 $ tsk list
-  1 [x] buy milk  (2m ago)
+  1    [x] buy milk     (2m ago)
+  2 !! [ ] urgent fix   (2m ago)
+  3  ! [ ] review PR    (2m ago)
 
 $ tsk list --pending
-no tasks
+  2 !! [ ] urgent fix   (2m ago)
+  3  ! [ ] review PR    (2m ago)
 
 $ tsk rm 1
 task 1 removed
 ```
 
-output is colored in the terminal — task IDs in cyan, done checkmarks in green, completed tasks dimmed. disable with `NO_COLOR=1` or in config.
+output is colored in the terminal — task IDs in cyan, done checkmarks in green, completed tasks dimmed, `!!` in red for high priority, `!` in yellow for medium. disable with `NO_COLOR=1` or in config.
 
 ---
 
@@ -77,6 +89,13 @@ $ tsk 3
   status:    pending
   created:   2026-02-14 19:42:25 (3h ago)
 
+$ tsk 2
+  id:        2
+  title:     urgent fix
+  priority:  high
+  status:    pending
+  created:   2026-02-14 19:42:25 (3h ago)
+
 $ tsk 1
   id:        1
   title:     write tests
@@ -85,21 +104,27 @@ $ tsk 1
   completed: 2026-02-14 11:15:00 (11h ago)
 ```
 
-the `completed:` line only appears for tasks that have been marked done. if the task ID does not exist, `tsk` prints an error and exits with status 1.
+the `priority:` line only appears for tasks that have a priority set (low, medium, or high). the `completed:` line only appears for tasks that have been marked done. if the task ID does not exist, `tsk` prints an error and exits with status 1.
 
 ### add
 
-create a new task.
+create a new task, optionally with a priority level.
 
 ```
-tsk add <title>
+tsk add [-p <priority>] <title>
 ```
 
-the title should be quoted if it contains spaces. each task gets an auto-incrementing ID.
+the title should be quoted if it contains spaces. each task gets an auto-incrementing ID. the `-p` flag sets the priority: `low`, `medium`, or `high`. if omitted, the task has no priority.
 
 ```
 $ tsk add "buy milk"
 added task 1: buy milk
+
+$ tsk add -p high "urgent fix"
+added task 2: urgent fix
+
+$ tsk add -p low "someday"
+added task 3: someday
 ```
 
 ### list
@@ -134,7 +159,7 @@ no tasks
 
 when there are no tasks matching the filter, `tsk` prints `no tasks`.
 
-each line shows the task ID, completion status (`[ ]` or `[x]`), title, and how long ago it was created.
+each line shows the task ID, a priority indicator (`!!` for high, `!` for medium, blank otherwise), completion status (`[ ]` or `[x]`), title, and how long ago it was created. low priority tasks do not show an indicator in the list — use `tsk <id>` to see the priority in the detail view.
 
 **time display:**
 
@@ -245,6 +270,49 @@ tsk v0.2.0
 
 ---
 
+## priority
+
+tasks can have an optional priority level: `low`, `medium`, or `high`. set it when adding a task with the `-p` flag:
+
+```
+$ tsk add -p high "deploy hotfix"
+added task 1: deploy hotfix
+
+$ tsk add -p medium "review PR"
+added task 2: review PR
+
+$ tsk add -p low "update docs"
+added task 3: update docs
+
+$ tsk add "buy milk"
+added task 4: buy milk
+```
+
+in the list view, high priority shows `!!` (red) and medium shows `!` (yellow). low and no-priority tasks have no indicator, keeping the list clean:
+
+```
+$ tsk list
+  1 !! [ ] deploy hotfix  (just now)
+  2  ! [ ] review PR      (just now)
+  3    [ ] update docs    (just now)
+  4    [ ] buy milk       (just now)
+```
+
+the detail view shows the priority for any task that has one set:
+
+```
+$ tsk 1
+  id:        1
+  title:     deploy hotfix
+  priority:  high
+  status:    pending
+  created:   2026-02-14 19:42:25 (just now)
+```
+
+tasks without a priority omit the `priority:` line entirely. existing tasks from before this feature load fine with no priority (backwards compatible).
+
+---
+
 ## configuration
 
 tsk reads configuration from `~/.config/tsk/config.toml`. if the file does not exist, sensible defaults are used — tsk works out of the box with no configuration.
@@ -293,6 +361,13 @@ the file contains a JSON array of task objects:
   },
   {
     "id": 2,
+    "title": "urgent fix",
+    "done": false,
+    "priority": "high",
+    "created_at": "2025-01-15T10:30:00Z"
+  },
+  {
+    "id": 3,
     "title": "write tests",
     "done": true,
     "created_at": "2025-01-15T10:30:00Z",
@@ -308,6 +383,7 @@ the file contains a JSON array of task objects:
 | `id` | integer | auto-incrementing task identifier |
 | `title` | string | task description |
 | `done` | boolean | completion status |
+| `priority` | string (optional) | `"low"`, `"medium"`, or `"high"`; omitted when not set |
 | `created_at` | string | RFC 3339 timestamp of when the task was created |
 | `completed_at` | string (optional) | RFC 3339 timestamp of when the task was marked done; omitted for pending tasks |
 

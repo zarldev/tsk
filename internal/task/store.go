@@ -79,12 +79,13 @@ func nextID(tasks []Task) int {
 	return max + 1
 }
 
-// Add creates a new task with the given title and appends it to the list.
-func Add(tasks []Task, title string) []Task {
+// Add creates a new task with the given title and priority, and appends it to the list.
+func Add(tasks []Task, title string, priority Priority) []Task {
 	t := Task{
 		ID:        nextID(tasks),
 		Title:     title,
 		Done:      false,
+		Priority:  priority,
 		CreatedAt: time.Now(),
 	}
 	return append(tasks, t)

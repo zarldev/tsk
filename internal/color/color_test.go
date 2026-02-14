@@ -19,6 +19,10 @@ func TestPaletteEnabled(t *testing.T) {
 		{"Cyan", p.Cyan, "\033[36mhello\033[0m"},
 		{"BoldCyan", p.BoldCyan, "\033[1m\033[36mhello\033[0m"},
 		{"DimStrikethrough", p.DimStrikethrough, "\033[2m\033[9mhello\033[0m"},
+		{"Red", p.Red, "\033[31mhello\033[0m"},
+		{"Yellow", p.Yellow, "\033[33mhello\033[0m"},
+		{"BoldRed", p.BoldRed, "\033[1m\033[31mhello\033[0m"},
+		{"BoldYellow", p.BoldYellow, "\033[1m\033[33mhello\033[0m"},
 	}
 
 	for _, tt := range tests {
@@ -44,6 +48,10 @@ func TestPaletteDisabled(t *testing.T) {
 		{"Cyan", p.Cyan},
 		{"BoldCyan", p.BoldCyan},
 		{"DimStrikethrough", p.DimStrikethrough},
+		{"Red", p.Red},
+		{"Yellow", p.Yellow},
+		{"BoldRed", p.BoldRed},
+		{"BoldYellow", p.BoldYellow},
 	}
 
 	for _, tt := range tests {

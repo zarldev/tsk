@@ -9,8 +9,10 @@ const (
 	bold          = "\033[1m"
 	dim           = "\033[2m"
 	strikethrough = "\033[9m"
-	cyan          = "\033[36m"
+	red           = "\033[31m"
 	green         = "\033[32m"
+	yellow        = "\033[33m"
+	cyan          = "\033[36m"
 )
 
 // Palette applies ANSI color codes to strings.
@@ -89,4 +91,24 @@ func (p Palette) BoldCyan(s string) string {
 // DimStrikethrough returns s in dim with strikethrough.
 func (p Palette) DimStrikethrough(s string) string {
 	return p.wrap(dim+strikethrough, s)
+}
+
+// Red returns s in red.
+func (p Palette) Red(s string) string {
+	return p.wrap(red, s)
+}
+
+// Yellow returns s in yellow.
+func (p Palette) Yellow(s string) string {
+	return p.wrap(yellow, s)
+}
+
+// BoldRed returns s in bold red.
+func (p Palette) BoldRed(s string) string {
+	return p.wrap(bold+red, s)
+}
+
+// BoldYellow returns s in bold yellow.
+func (p Palette) BoldYellow(s string) string {
+	return p.wrap(bold+yellow, s)
 }

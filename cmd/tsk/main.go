@@ -75,8 +75,27 @@ func main() {
 
 func cmdAdd(store task.Store, c color.Palette) {
 	if len(os.Args) < 3 {
-		fmt.Fprintln(os.Stderr, "usage: tsk add <title>")
+		fmt.Fprintln(os.Stderr, "usage: tsk add [-p <priority>] <title>")
 		os.Exit(1)
+	}
+
+	var title string
+	var priority task.Priority
+
+	if os.Args[2] == "-p" {
+		if len(os.Args) < 5 {
+			fmt.Fprintln(os.Stderr, "usage: tsk add -p <priority> <title>")
+			os.Exit(1)
+		}
+		p, ok := task.ValidPriority(os.Args[3])
+		if !ok {
+			fmt.Fprintf(os.Stderr, "invalid priority: %s (use low, medium, high)\n", os.Args[3])
+			os.Exit(1)
+		}
+		priority = p
+		title = os.Args[4]
+	} else {
+		title = os.Args[2]
 	}
 
 	tasks, err := store.Load()
@@ -84,8 +103,7 @@ func cmdAdd(store task.Store, c color.Palette) {
 		fatal(err)
 	}
 
-	title := os.Args[2]
-	tasks = task.Add(tasks, title)
+	tasks = task.Add(tasks, title, priority)
 
 	if err := store.Save(tasks); err != nil {
 		fatal(err)
@@ -117,6 +135,12 @@ func cmdShow(store task.Store, c color.Palette, id int) {
 
 	fmt.Printf("  %s  %s\n", c.Dim("id:"), c.BoldCyan(strconv.Itoa(t.ID)))
 	fmt.Printf("  %s  %s\n", c.Dim("title:"), t.Title)
+
+	if t.Priority != task.PriorityNone {
+		pv := colorPriority(c, t.Priority)
+		fmt.Printf("  %s  %s\n", c.Dim("priority:"), pv)
+	}
+
 	fmt.Printf("  %s  %s\n", c.Dim("status:"), status)
 	fmt.Printf("  %s  %s %s\n", c.Dim("created:"), created, c.Dim("("+createdAge+")"))
 
@@ -155,13 +179,14 @@ func cmdList(store task.Store, c color.Palette) {
 	for _, t := range filtered {
 		id := c.BoldCyan(fmt.Sprintf("%3d", t.ID))
 		a := c.Dim(fmt.Sprintf("(%s)", age(t.CreatedAt)))
+		pri := priorityIndicator(c, t.Priority)
 
 		if t.Done {
 			check := c.Green("[x]")
 			title := c.DimStrikethrough(t.Title)
-			fmt.Printf("%s %s %s  %s\n", id, check, title, a)
+			fmt.Printf("%s %s %s %s  %s\n", id, pri, check, title, a)
 		} else {
-			fmt.Printf("%s [ ] %s  %s\n", id, t.Title, a)
+			fmt.Printf("%s %s [ ] %s  %s\n", id, pri, t.Title, a)
 		}
 	}
 }
@@ -318,6 +343,32 @@ func age(t time.Time) string {
 	}
 }
 
+// priorityIndicator returns a 2-char wide indicator for the list view.
+func priorityIndicator(c color.Palette, p task.Priority) string {
+	switch p {
+	case task.PriorityHigh:
+		return c.BoldRed("!!")
+	case task.PriorityMedium:
+		return c.BoldYellow(" !")
+	default:
+		return "  "
+	}
+}
+
+// colorPriority returns the priority value colored for the detail view.
+func colorPriority(c color.Palette, p task.Priority) string {
+	switch p {
+	case task.PriorityHigh:
+		return c.Red(string(p))
+	case task.PriorityMedium:
+		return c.Yellow(string(p))
+	case task.PriorityLow:
+		return c.Dim(string(p))
+	default:
+		return string(p)
+	}
+}
+
 func cmdConfig(cfg config.Config) {
 	fmt.Print(cfg.String())
 }
@@ -342,7 +393,7 @@ func usage() {
 
 commands:
   <id>                         show task details
-  add <title>                  add a new task
+  add [-p <priority>] <title>  add a new task (priority: low, medium, high)
   list, ls [--done|--pending]  list tasks
   done <id>[,<id>,...]         mark tasks as done
   edit <id> <title>            rename a task
