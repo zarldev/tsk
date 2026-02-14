@@ -4,9 +4,34 @@ title: "docs"
 
 # tsk documentation
 
+- [demo](#demo)
 - [install](#install)
 - [commands](#commands) -- [add](#add) / [list](#list) / [done](#done) / [rm](#rm)
 - [storage](#storage)
+
+---
+
+## demo
+
+```
+$ tsk add "buy milk"
+added task 1: buy milk
+
+$ tsk list
+  1 [ ] buy milk  (just now)
+
+$ tsk done 1
+task 1 marked done
+
+$ tsk list
+  1 [x] buy milk  (2m ago)
+
+$ tsk list --pending
+no tasks
+
+$ tsk rm 1
+task 1 removed
+```
 
 ---
 

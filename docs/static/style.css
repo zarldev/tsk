@@ -249,14 +249,33 @@ em {
 
 .hero {
   text-align: center;
-  padding: 3rem 0 2rem;
+  padding: 4rem 0 3rem;
+}
+
+.hero-full {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 3.5rem - 3.5rem);
+  padding: 2rem 1rem;
+}
+
+.hero-links {
+  margin-top: 2rem;
+  font-size: 1rem;
+  color: var(--text-muted);
+}
+
+.hero-links a {
+  font-weight: 700;
 }
 
 .ascii-title {
   color: var(--accent);
-  font-size: 1.4rem;
+  font-size: 2rem;
   line-height: 1.2;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   border: none;
   background: none;
   display: inline-block;
@@ -297,56 +316,6 @@ em {
   text-align: left;
 }
 
-/* -- demo section ---------------------------------------------------------- */
-
-.demo {
-  padding: 2rem 0;
-}
-
-.demo h2 {
-  margin-bottom: 1.25rem;
-}
-
-/* -- features section ------------------------------------------------------ */
-
-.features {
-  padding: 2rem 0;
-}
-
-.features h2 {
-  margin-bottom: 1.25rem;
-}
-
-.features ul {
-  list-style: none;
-  padding-left: 0;
-}
-
-.features li {
-  padding: 0.5rem 0;
-  padding-left: 1.5rem;
-  position: relative;
-}
-
-.features li::before {
-  content: ">";
-  position: absolute;
-  left: 0;
-  color: var(--accent);
-  font-weight: 700;
-}
-
-/* -- docs link section ----------------------------------------------------- */
-
-.docs-link {
-  padding: 2rem 0 3rem;
-  font-size: 1rem;
-}
-
-.docs-link a {
-  font-weight: 700;
-}
-
 /* -- content (single page layout) ------------------------------------------ */
 
 .content {
@@ -384,7 +353,7 @@ footer a:hover {
   }
 
   .ascii-title {
-    font-size: 1rem;
+    font-size: 1.1rem;
   }
 
   .tagline {
