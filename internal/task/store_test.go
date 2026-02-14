@@ -44,10 +44,11 @@ func TestLoadEmptyFile(t *testing.T) {
 func TestSaveAndLoad(t *testing.T) {
 	store := tempStore(t)
 	now := time.Now().Truncate(time.Second)
+	completed := now.Add(-30 * time.Minute)
 
 	original := []Task{
 		{ID: 1, Title: "buy milk", Done: false, CreatedAt: now},
-		{ID: 2, Title: "write code", Done: true, CreatedAt: now},
+		{ID: 2, Title: "write code", Done: true, CreatedAt: now, CompletedAt: &completed},
 	}
 
 	if err := store.Save(original); err != nil {
@@ -76,6 +77,19 @@ func TestSaveAndLoad(t *testing.T) {
 		if !loaded[i].CreatedAt.Equal(original[i].CreatedAt) {
 			t.Errorf("task %d: CreatedAt = %v, want %v", i, loaded[i].CreatedAt, original[i].CreatedAt)
 		}
+	}
+
+	// pending task: CompletedAt should be nil
+	if loaded[0].CompletedAt != nil {
+		t.Error("task 1: CompletedAt should be nil for pending task")
+	}
+
+	// done task: CompletedAt should round-trip
+	if loaded[1].CompletedAt == nil {
+		t.Fatal("task 2: CompletedAt should not be nil")
+	}
+	if !loaded[1].CompletedAt.Equal(completed) {
+		t.Errorf("task 2: CompletedAt = %v, want %v", *loaded[1].CompletedAt, completed)
 	}
 }
 
@@ -181,9 +195,14 @@ func TestDone(t *testing.T) {
 			if err != nil {
 				return
 			}
-			for _, tk := range tt.tasks {
-				if tk.ID == tt.id && !tk.Done {
-					t.Errorf("task %d should be done", tt.id)
+			for i := range tt.tasks {
+				if tt.tasks[i].ID == tt.id {
+					if !tt.tasks[i].Done {
+						t.Errorf("task %d should be done", tt.id)
+					}
+					if tt.tasks[i].CompletedAt == nil {
+						t.Errorf("task %d: CompletedAt should be set", tt.id)
+					}
 				}
 			}
 		})
@@ -277,6 +296,84 @@ func TestList(t *testing.T) {
 	}
 }
 
+func TestAddCompletedAtNil(t *testing.T) {
+	tasks := Add(nil, "new task")
+	if tasks[0].CompletedAt != nil {
+		t.Error("new task should have nil CompletedAt")
+	}
+}
+
+func TestDoneCompletedAtRoundTrip(t *testing.T) {
+	store := tempStore(t)
+	now := time.Now().Truncate(time.Second)
+	completed := now.Add(-time.Hour)
+
+	original := []Task{
+		{ID: 1, Title: "pending", Done: false, CreatedAt: now},
+		{ID: 2, Title: "done", Done: true, CreatedAt: now, CompletedAt: &completed},
+	}
+
+	if err := store.Save(original); err != nil {
+		t.Fatalf("save: %v", err)
+	}
+
+	loaded, err := store.Load()
+	if err != nil {
+		t.Fatalf("load: %v", err)
+	}
+
+	// pending task: CompletedAt should remain nil
+	if loaded[0].CompletedAt != nil {
+		t.Error("task 1: CompletedAt should be nil")
+	}
+
+	// done task: CompletedAt should round-trip
+	if loaded[1].CompletedAt == nil {
+		t.Fatal("task 2: CompletedAt should not be nil")
+	}
+	if !loaded[1].CompletedAt.Equal(completed) {
+		t.Errorf("task 2: CompletedAt = %v, want %v", *loaded[1].CompletedAt, completed)
+	}
+}
+
+func TestFind(t *testing.T) {
+	tasks := []Task{
+		{ID: 1, Title: "first"},
+		{ID: 3, Title: "third"},
+		{ID: 5, Title: "fifth"},
+	}
+
+	tests := []struct {
+		name      string
+		id        int
+		wantTitle string
+		wantNil   bool
+	}{
+		{"existing first", 1, "first", false},
+		{"existing middle", 3, "third", false},
+		{"existing last", 5, "fifth", false},
+		{"not found", 99, "", true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := Find(tasks, tt.id)
+			if tt.wantNil {
+				if got != nil {
+					t.Errorf("expected nil, got %+v", got)
+				}
+				return
+			}
+			if got == nil {
+				t.Fatal("expected non-nil task")
+			}
+			if got.Title != tt.wantTitle {
+				t.Errorf("Title = %q, want %q", got.Title, tt.wantTitle)
+			}
+		})
+	}
+}
+
 func TestRoundTrip(t *testing.T) {
 	store := tempStore(t)
 
@@ -318,6 +415,9 @@ func TestRoundTrip(t *testing.T) {
 	}
 	if !tasks[1].Done {
 		t.Error("task 2 should be done")
+	}
+	if tasks[1].CompletedAt == nil {
+		t.Error("task 2: CompletedAt should be set after done")
 	}
 
 	tasks, err = Remove(tasks, 1)

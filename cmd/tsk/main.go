@@ -59,6 +59,10 @@ func main() {
 	case "version":
 		fmt.Printf("tsk %s\n", version)
 	default:
+		if id, err := strconv.Atoi(os.Args[1]); err == nil {
+			cmdShow(store, c, id)
+			return
+		}
 		fmt.Fprintf(os.Stderr, "unknown command: %s\n", os.Args[1])
 		usage()
 		os.Exit(1)
@@ -85,6 +89,38 @@ func cmdAdd(store task.Store, c color.Palette) {
 
 	t := tasks[len(tasks)-1]
 	fmt.Printf("added task %s: %s\n", c.BoldCyan(strconv.Itoa(t.ID)), t.Title)
+}
+
+func cmdShow(store task.Store, c color.Palette, id int) {
+	tasks, err := store.Load()
+	if err != nil {
+		fatal(err)
+	}
+
+	t := task.Find(tasks, id)
+	if t == nil {
+		fmt.Fprintf(os.Stderr, "task %d: not found\n", id)
+		os.Exit(1)
+	}
+
+	status := "pending"
+	if t.Done {
+		status = c.Green("done")
+	}
+
+	created := t.CreatedAt.Format("2006-01-02 15:04:05")
+	createdAge := age(t.CreatedAt)
+
+	fmt.Printf("  %s  %s\n", c.Dim("id:"), c.BoldCyan(strconv.Itoa(t.ID)))
+	fmt.Printf("  %s  %s\n", c.Dim("title:"), t.Title)
+	fmt.Printf("  %s  %s\n", c.Dim("status:"), status)
+	fmt.Printf("  %s  %s %s\n", c.Dim("created:"), created, c.Dim("("+createdAge+")"))
+
+	if t.CompletedAt != nil {
+		completed := t.CompletedAt.Format("2006-01-02 15:04:05")
+		completedAge := age(*t.CompletedAt)
+		fmt.Printf("  %s  %s %s\n", c.Dim("completed:"), completed, c.Dim("("+completedAge+")"))
+	}
 }
 
 func cmdList(store task.Store, c color.Palette) {
@@ -241,12 +277,13 @@ func usage() {
 	fmt.Fprintln(os.Stderr, `usage: tsk <command> [args]
 
 commands:
-  add <title>              add a new task
+  <id>                         show task details
+  add <title>                  add a new task
   list, ls [--done|--pending]  list tasks
-  done <id>[,<id>,...]     mark tasks as done
-  rm <id>[,<id>,...]       remove tasks
-  config                   show current configuration
-  version                  print version`)
+  done <id>[,<id>,...]         mark tasks as done
+  rm <id>[,<id>,...]           remove tasks
+  config                       show current configuration
+  version                      print version`)
 }
 
 func fatal(err error) {
