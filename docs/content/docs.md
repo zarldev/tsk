@@ -6,7 +6,7 @@ title: "docs"
 
 - [demo](#demo)
 - [install](#install)
-- [commands](#commands) -- [add](#add) / [list (ls)](#list) / [done](#done) / [rm](#rm) / [config](#config) / [version](#version)
+- [commands](#commands) -- [show](#show) / [add](#add) / [list (ls)](#list) / [done](#done) / [rm](#rm) / [config](#config) / [version](#version)
 - [configuration](#configuration)
 - [storage](#storage)
 
@@ -59,6 +59,33 @@ this places the `tsk` binary in your `$GOPATH/bin` directory. make sure that dir
 ---
 
 ## commands
+
+### show
+
+display detailed information about a single task.
+
+```
+tsk <id>
+```
+
+pass a task ID as the first argument (no subcommand needed).
+
+```
+$ tsk 3
+  id:        3
+  title:     buy milk
+  status:    pending
+  created:   2026-02-14 19:42:25 (3h ago)
+
+$ tsk 1
+  id:        1
+  title:     write tests
+  status:    done
+  created:   2026-02-14 10:30:00 (12h ago)
+  completed: 2026-02-14 11:15:00 (11h ago)
+```
+
+the `completed:` line only appears for tasks that have been marked done. if the task ID does not exist, `tsk` prints an error and exits with status 1.
 
 ### add
 
@@ -228,6 +255,13 @@ the file contains a JSON array of task objects:
     "title": "buy milk",
     "done": false,
     "created_at": "2025-01-15T10:30:00Z"
+  },
+  {
+    "id": 2,
+    "title": "write tests",
+    "done": true,
+    "created_at": "2025-01-15T10:30:00Z",
+    "completed_at": "2025-01-15T11:15:00Z"
   }
 ]
 ```
@@ -240,6 +274,7 @@ the file contains a JSON array of task objects:
 | `title` | string | task description |
 | `done` | boolean | completion status |
 | `created_at` | string | RFC 3339 timestamp of when the task was created |
+| `completed_at` | string (optional) | RFC 3339 timestamp of when the task was marked done; omitted for pending tasks |
 
 because the storage is plain JSON, you can back it up, sync it across machines, edit it manually, or version control it.
 

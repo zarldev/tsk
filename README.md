@@ -35,6 +35,7 @@ go install github.com/zarldev/tsk/cmd/tsk@latest
 tsk add "buy milk"       # add a task
 tsk list                 # show all tasks
 tsk ls                   # same as list
+tsk 1                    # show task 1 details
 tsk done 1               # mark task 1 complete
 tsk done 1,3,5           # mark multiple tasks complete
 tsk rm 1                 # remove task 1

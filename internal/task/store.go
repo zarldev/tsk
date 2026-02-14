@@ -96,10 +96,22 @@ func Done(tasks []Task, id int) error {
 	for i := range tasks {
 		if tasks[i].ID == id {
 			tasks[i].Done = true
+			now := time.Now()
+			tasks[i].CompletedAt = &now
 			return nil
 		}
 	}
 	return fmt.Errorf("task %d: not found", id)
+}
+
+// Find returns a pointer to the task with the given ID, or nil if not found.
+func Find(tasks []Task, id int) *Task {
+	for i := range tasks {
+		if tasks[i].ID == id {
+			return &tasks[i]
+		}
+	}
+	return nil
 }
 
 // Remove deletes the task with the given ID and returns the updated slice.
