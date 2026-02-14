@@ -193,6 +193,28 @@ pre code {
   background: var(--accent);
 }
 
+/* -- terminal tabs --------------------------------------------------------- */
+
+.terminal-tabs {
+  display: flex;
+  background: var(--bg-raised);
+  border-bottom: 1px solid var(--border);
+}
+
+.terminal-tab {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.85rem;
+  border-bottom: 2px solid transparent;
+}
+
+.terminal-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
 /* -- prompt styling -------------------------------------------------------- */
 
 .prompt {

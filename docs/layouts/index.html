@@ -11,11 +11,32 @@
   <div class="install-block">
     <div class="terminal-window">
       <div class="terminal-chrome"><span></span><span></span><span></span></div>
-      <pre><code><span class="prompt">$</span> brew install zarldev/tap/tsk</code></pre>
+      <div class="terminal-tabs">
+        <span class="terminal-tab" data-tab="macos">macOS</span>
+        <span class="terminal-tab" data-tab="linux">Linux</span>
+        <span class="terminal-tab active" data-tab="go">go install</span>
+      </div>
+      <pre class="terminal-cmd" data-tab="macos" hidden><code><span class="prompt">$</span> brew install zarldev/tap/tsk</code></pre>
+      <pre class="terminal-cmd" data-tab="linux" hidden><code><span class="prompt">$</span> brew install zarldev/tap/tsk</code></pre>
+      <pre class="terminal-cmd" data-tab="go"><code><span class="prompt">$</span> go install github.com/zarldev/tsk/cmd/tsk@latest</code></pre>
     </div>
   </div>
   <p class="hero-links">
     <a href="/tsk/docs/">docs</a> &middot; <a href="https://github.com/zarldev/tsk">github</a>
   </p>
 </section>
+<script>
+(function() {
+  var tabs = document.querySelectorAll('.terminal-tab');
+  var cmds = document.querySelectorAll('.terminal-cmd');
+  var p = navigator.platform || '';
+  var dflt = p.startsWith('Mac') ? 'macos' : p.indexOf('Linux') !== -1 ? 'linux' : 'go';
+  function activate(id) {
+    tabs.forEach(function(t) { t.classList.toggle('active', t.dataset.tab === id); });
+    cmds.forEach(function(c) { c.hidden = c.dataset.tab !== id; });
+  }
+  tabs.forEach(function(t) { t.addEventListener('click', function() { activate(t.dataset.tab); }); });
+  activate(dflt);
+})();
+</script>
 {{ end }}
