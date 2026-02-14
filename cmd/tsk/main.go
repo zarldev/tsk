@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/zarldev/tsk/internal/color"
@@ -47,7 +48,7 @@ func main() {
 	switch os.Args[1] {
 	case "add":
 		cmdAdd(store, c)
-	case "list":
+	case "list", "ls":
 		cmdList(store, c)
 	case "done":
 		cmdDone(store, c)
@@ -127,13 +128,13 @@ func cmdList(store task.Store, c color.Palette) {
 
 func cmdDone(store task.Store, c color.Palette) {
 	if len(os.Args) < 3 {
-		fmt.Fprintln(os.Stderr, "usage: tsk done <id>")
+		fmt.Fprintln(os.Stderr, "usage: tsk done <id>[,<id>,...]")
 		os.Exit(1)
 	}
 
-	id, err := strconv.Atoi(os.Args[2])
+	ids, err := parseIDs(os.Args[2])
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "invalid id: %s\n", os.Args[2])
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
@@ -142,26 +143,34 @@ func cmdDone(store task.Store, c color.Palette) {
 		fatal(err)
 	}
 
-	if err := task.Done(tasks, id); err != nil {
-		fatal(err)
+	var hadErr bool
+	for _, id := range ids {
+		if err := task.Done(tasks, id); err != nil {
+			fmt.Fprintf(os.Stderr, "task %d: not found\n", id)
+			hadErr = true
+			continue
+		}
+		fmt.Printf("task %s marked %s\n", c.BoldCyan(strconv.Itoa(id)), c.Green("done"))
 	}
 
 	if err := store.Save(tasks); err != nil {
 		fatal(err)
 	}
 
-	fmt.Printf("task %s marked %s\n", c.BoldCyan(strconv.Itoa(id)), c.Green("done"))
+	if hadErr {
+		os.Exit(1)
+	}
 }
 
 func cmdRm(store task.Store, c color.Palette) {
 	if len(os.Args) < 3 {
-		fmt.Fprintln(os.Stderr, "usage: tsk rm <id>")
+		fmt.Fprintln(os.Stderr, "usage: tsk rm <id>[,<id>,...]")
 		os.Exit(1)
 	}
 
-	id, err := strconv.Atoi(os.Args[2])
+	ids, err := parseIDs(os.Args[2])
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "invalid id: %s\n", os.Args[2])
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
@@ -170,16 +179,25 @@ func cmdRm(store task.Store, c color.Palette) {
 		fatal(err)
 	}
 
-	tasks, err = task.Remove(tasks, id)
-	if err != nil {
-		fatal(err)
+	var hadErr bool
+	for _, id := range ids {
+		var rmErr error
+		tasks, rmErr = task.Remove(tasks, id)
+		if rmErr != nil {
+			fmt.Fprintf(os.Stderr, "task %d: not found\n", id)
+			hadErr = true
+			continue
+		}
+		fmt.Printf("task %s removed\n", c.BoldCyan(strconv.Itoa(id)))
 	}
 
 	if err := store.Save(tasks); err != nil {
 		fatal(err)
 	}
 
-	fmt.Printf("task %s removed\n", c.BoldCyan(strconv.Itoa(id)))
+	if hadErr {
+		os.Exit(1)
+	}
 }
 
 func age(t time.Time) string {
@@ -204,14 +222,29 @@ func cmdConfig(cfg config.Config) {
 	fmt.Print(cfg.String())
 }
 
+// parseIDs splits a comma-separated string into a slice of task IDs.
+// All segments must be valid integers; returns an error on the first invalid one.
+func parseIDs(arg string) ([]int, error) {
+	parts := strings.Split(arg, ",")
+	ids := make([]int, 0, len(parts))
+	for _, p := range parts {
+		id, err := strconv.Atoi(p)
+		if err != nil {
+			return nil, fmt.Errorf("invalid id: %s", p)
+		}
+		ids = append(ids, id)
+	}
+	return ids, nil
+}
+
 func usage() {
 	fmt.Fprintln(os.Stderr, `usage: tsk <command> [args]
 
 commands:
   add <title>              add a new task
-  list [--done|--pending]  list tasks
-  done <id>                mark a task as done
-  rm <id>                  remove a task
+  list, ls [--done|--pending]  list tasks
+  done <id>[,<id>,...]     mark tasks as done
+  rm <id>[,<id>,...]       remove tasks
   config                   show current configuration
   version                  print version`)
 }

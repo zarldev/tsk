@@ -6,7 +6,7 @@ title: "docs"
 
 - [demo](#demo)
 - [install](#install)
-- [commands](#commands) -- [add](#add) / [list](#list) / [done](#done) / [rm](#rm) / [config](#config) / [version](#version)
+- [commands](#commands) -- [add](#add) / [list (ls)](#list) / [done](#done) / [rm](#rm) / [config](#config) / [version](#version)
 - [configuration](#configuration)
 - [storage](#storage)
 
@@ -77,10 +77,11 @@ added task 1: buy milk
 
 ### list
 
-display tasks. by default shows all tasks.
+display tasks. by default shows all tasks. `ls` is an alias for `list`.
 
 ```
 tsk list [--done|--pending]
+tsk ls [--done|--pending]
 ```
 
 show all tasks:
@@ -120,33 +121,42 @@ each line shows the task ID, completion status (`[ ]` or `[x]`), title, and how 
 
 ### done
 
-mark a task as completed.
+mark one or more tasks as completed. accepts a single ID or comma-separated IDs.
 
 ```
-tsk done <id>
+tsk done <id>[,<id>,...]
 ```
 
 ```
 $ tsk done 1
 task 1 marked done
+
+$ tsk done 1,3,5
+task 1 marked done
+task 3 marked done
+task 5 marked done
 ```
 
-if the ID does not exist, `tsk` prints an error and exits with a non-zero status.
+if an ID does not exist, `tsk` prints an error for that ID and continues with the rest. the exit status is non-zero if any ID was not found.
 
 ### rm
 
-remove a task permanently.
+remove one or more tasks permanently. accepts a single ID or comma-separated IDs.
 
 ```
-tsk rm <id>
+tsk rm <id>[,<id>,...]
 ```
 
 ```
 $ tsk rm 1
 task 1 removed
+
+$ tsk rm 2,4
+task 2 removed
+task 4 removed
 ```
 
-this deletes the task from storage entirely. there is no undo.
+this deletes the task from storage entirely. there is no undo. if an ID does not exist, `tsk` prints an error for that ID and continues with the rest.
 
 ### config
 
