@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/zarldev/tsk/internal/config"
 	"github.com/zarldev/tsk/internal/task"
 )
 
@@ -17,10 +18,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	path, err := task.DefaultPath()
+	cfg, err := config.Load()
 	if err != nil {
 		fatal(err)
 	}
+
+	path := cfg.Storage.Path
 
 	switch os.Args[1] {
 	case "add":
@@ -31,6 +34,8 @@ func main() {
 		cmdDone(path)
 	case "rm":
 		cmdRm(path)
+	case "config":
+		cmdConfig(cfg)
 	case "version":
 		fmt.Printf("tsk %s\n", version)
 	default:
@@ -171,6 +176,10 @@ func age(t time.Time) string {
 	}
 }
 
+func cmdConfig(cfg config.Config) {
+	fmt.Print(cfg.String())
+}
+
 func usage() {
 	fmt.Fprintln(os.Stderr, `usage: tsk <command> [args]
 
@@ -179,6 +188,7 @@ commands:
   list [--done|--pending]  list tasks
   done <id>                mark a task as done
   rm <id>                  remove a task
+  config                   show current configuration
   version                  print version`)
 }
 
