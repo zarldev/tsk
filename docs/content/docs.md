@@ -6,7 +6,7 @@ title: "docs"
 
 - [demo](#demo)
 - [install](#install)
-- [commands](#commands) -- [show](#show) / [add](#add) / [list (ls)](#list) / [done](#done) / [rm](#rm) / [clear](#clear) / [config](#config) / [version](#version)
+- [commands](#commands) -- [show](#show) / [add](#add) / [list (ls)](#list) / [done](#done) / [edit](#edit) / [rm](#rm) / [clear](#clear) / [config](#config) / [version](#version)
 - [configuration](#configuration)
 - [storage](#storage)
 
@@ -165,6 +165,23 @@ task 5 marked done
 ```
 
 if an ID does not exist, `tsk` prints an error for that ID and continues with the rest. the exit status is non-zero if any ID was not found.
+
+### edit
+
+rename an existing task. the task keeps its ID, creation timestamp, and completion status.
+
+```
+tsk edit <id> <title>
+```
+
+the title should be quoted if it contains spaces.
+
+```
+$ tsk edit 1 "buy oat milk"
+task 1 updated: buy oat milk
+```
+
+if the ID does not exist, `tsk` prints an error and exits with status 1.
 
 ### rm
 
