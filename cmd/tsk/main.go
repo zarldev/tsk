@@ -54,6 +54,8 @@ func main() {
 		cmdDone(store, c)
 	case "rm":
 		cmdRm(store, c)
+	case "clear":
+		cmdClear(store, c)
 	case "config":
 		cmdConfig(cfg)
 	case "version":
@@ -236,6 +238,35 @@ func cmdRm(store task.Store, c color.Palette) {
 	}
 }
 
+func cmdClear(store task.Store, c color.Palette) {
+	tasks, err := store.Load()
+	if err != nil {
+		fatal(err)
+	}
+
+	removed, tasks := task.ClearDone(tasks)
+
+	if removed == 0 {
+		fmt.Println("no done tasks to clear")
+		return
+	}
+
+	if err := store.Save(tasks); err != nil {
+		fatal(err)
+	}
+
+	fmt.Printf("cleared %s done %s\n",
+		c.BoldCyan(strconv.Itoa(removed)),
+		pluralize(removed, "task", "tasks"))
+}
+
+func pluralize(n int, singular, plural string) string {
+	if n == 1 {
+		return singular
+	}
+	return plural
+}
+
 func age(t time.Time) string {
 	d := time.Since(t)
 	switch {
@@ -282,6 +313,7 @@ commands:
   list, ls [--done|--pending]  list tasks
   done <id>[,<id>,...]         mark tasks as done
   rm <id>[,<id>,...]           remove tasks
+  clear                        remove all done tasks
   config                       show current configuration
   version                      print version`)
 }

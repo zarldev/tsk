@@ -125,6 +125,18 @@ func Remove(tasks []Task, id int) ([]Task, error) {
 	return tasks, fmt.Errorf("task %d: not found", id)
 }
 
+// ClearDone removes all completed tasks and returns the count removed
+// along with the remaining tasks.
+func ClearDone(tasks []Task) (removed int, remaining []Task) {
+	var out []Task
+	for _, t := range tasks {
+		if !t.Done {
+			out = append(out, t)
+		}
+	}
+	return len(tasks) - len(out), out
+}
+
 // Filter controls which tasks List returns.
 type Filter int
 
