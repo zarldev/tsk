@@ -16,10 +16,10 @@
         <span class="terminal-tab" data-tab="linux">Linux</span>
         <span class="terminal-tab active" data-tab="go">go install</span>
       </div>
-      <pre class="terminal-cmd" data-tab="macos" hidden><code><span class="prompt">$</span> brew install zarldev/tap/tsk</code></pre>
+      <pre class="terminal-cmd" data-tab="macos" hidden><code><span class="prompt">$</span> brew install zarldev/tap/tsk</code><button class="copy-btn" data-copy="brew install zarldev/tap/tsk" aria-label="Copy">&#x2398;</button></pre>
       <pre class="terminal-cmd" data-tab="linux" hidden><code><span class="prompt">$</span> curl -fsSL https://github.com/zarldev/tsk/releases/latest/download/tsk-linux-amd64.tar.gz | tar xz
-<span class="prompt">$</span> sudo mv tsk /usr/local/bin/</code></pre>
-      <pre class="terminal-cmd" data-tab="go"><code><span class="prompt">$</span> go install github.com/zarldev/tsk/cmd/tsk@latest</code></pre>
+<span class="prompt">$</span> sudo mv tsk /usr/local/bin/</code><button class="copy-btn" data-copy="curl -fsSL https://github.com/zarldev/tsk/releases/latest/download/tsk-linux-amd64.tar.gz | tar xz && sudo mv tsk /usr/local/bin/" aria-label="Copy">&#x2398;</button></pre>
+      <pre class="terminal-cmd" data-tab="go"><code><span class="prompt">$</span> go install github.com/zarldev/tsk/cmd/tsk@latest</code><button class="copy-btn" data-copy="go install github.com/zarldev/tsk/cmd/tsk@latest" aria-label="Copy">&#x2398;</button></pre>
     </div>
   </div>
   <p class="hero-links">
@@ -38,6 +38,16 @@
   }
   tabs.forEach(function(t) { t.addEventListener('click', function() { activate(t.dataset.tab); }); });
   activate(dflt);
+
+  document.querySelectorAll('.copy-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      navigator.clipboard.writeText(btn.dataset.copy).then(function() {
+        btn.textContent = '\u2713';
+        btn.classList.add('copied');
+        setTimeout(function() { btn.innerHTML = '\u2398'; btn.classList.remove('copied'); }, 1500);
+      });
+    });
+  });
 })();
 </script>
 {{ end }}
