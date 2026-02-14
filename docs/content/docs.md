@@ -181,4 +181,33 @@ the file contains a JSON array of task objects:
 
 because the storage is plain JSON, you can back it up, sync it across machines, edit it manually, or version control it.
 
-`tsk` has no configuration file, no environment variables, and no flags beyond those documented above. it works out of the box.
+---
+
+## storage backends
+
+### file (default)
+
+tasks stored in `~/.tasks.json`. configure with:
+
+```
+[storage]
+type = "file"
+path = "~/.tasks.json"
+```
+
+### github gist
+
+sync tasks across machines via a private gist. requires a GitHub token with `gist` scope.
+
+```
+[storage]
+type = "gist"
+gist_token = "ghp_..."
+gist_id = ""  # created on first run
+```
+
+or set the token via environment variable:
+
+```
+export TSK_GIST_TOKEN=ghp_...
+```

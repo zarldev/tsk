@@ -22,8 +22,10 @@ type ColorConfig struct {
 
 // StorageConfig controls task storage.
 type StorageConfig struct {
-	Type string // "file", "gist"
-	Path string // file path for "file" type
+	Type      string // "file", "gist"
+	Path      string // file path for "file" type
+	GistToken string // GitHub PAT with gist scope
+	GistID    string // gist ID (created on first save if empty)
 }
 
 // DefaultConfig returns configuration with sensible defaults.
@@ -97,6 +99,12 @@ func LoadFrom(path string) (Config, error) {
 		if v, ok := storage["path"]; ok {
 			cfg.Storage.Path = expandHome(v)
 		}
+		if v, ok := storage["gist_token"]; ok {
+			cfg.Storage.GistToken = v
+		}
+		if v, ok := storage["gist_id"]; ok {
+			cfg.Storage.GistID = v
+		}
 	}
 
 	return cfg, nil
@@ -111,6 +119,8 @@ func (c Config) String() string {
 	b.WriteString("\n[storage]\n")
 	fmt.Fprintf(&b, "type = %q\n", c.Storage.Type)
 	fmt.Fprintf(&b, "path = %q\n", c.Storage.Path)
+	fmt.Fprintf(&b, "gist_token = %q\n", c.Storage.GistToken)
+	fmt.Fprintf(&b, "gist_id = %q\n", c.Storage.GistID)
 	return b.String()
 }
 
