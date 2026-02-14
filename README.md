@@ -32,18 +32,19 @@ go install github.com/zarldev/tsk/cmd/tsk@latest
 ## Usage
 
 ```bash
-tsk add "buy milk"       # add a task
-tsk list                 # show all tasks
-tsk ls                   # same as list
-tsk 1                    # show task 1 details
-tsk done 1               # mark task 1 complete
-tsk done 1,3,5           # mark multiple tasks complete
-tsk edit 1 "buy oat milk"  # rename task 1
-tsk rm 1                 # remove task 1
-tsk rm 2,4               # remove multiple tasks
-tsk clear                # remove all done tasks
-tsk config               # print current config
-tsk version              # print version
+tsk add "buy milk"             # add a task
+tsk add -p high "urgent"       # add with priority (low, medium, high)
+tsk list                       # show all tasks
+tsk ls                         # same as list
+tsk 1                          # show task 1 details
+tsk done 1                     # mark task 1 complete
+tsk done 1,3,5                 # mark multiple tasks complete
+tsk edit 1 "buy oat milk"      # rename task 1
+tsk rm 1                       # remove task 1
+tsk rm 2,4                     # remove multiple tasks
+tsk clear                      # remove all done tasks
+tsk config                     # print current config
+tsk version                    # print version
 ```
 
 ## Docs

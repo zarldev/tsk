@@ -131,7 +131,7 @@ func TestAdd(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := Add(tt.existing, tt.title)
+			result := Add(tt.existing, tt.title, PriorityNone)
 
 			if len(result) != tt.wantLen {
 				t.Fatalf("len = %d, want %d", len(result), tt.wantLen)
@@ -387,7 +387,7 @@ func TestList(t *testing.T) {
 }
 
 func TestAddCompletedAtNil(t *testing.T) {
-	tasks := Add(nil, "new task")
+	tasks := Add(nil, "new task", PriorityNone)
 	if tasks[0].CompletedAt != nil {
 		t.Error("new task should have nil CompletedAt")
 	}
@@ -537,9 +537,9 @@ func TestRoundTrip(t *testing.T) {
 	}
 
 	// add tasks
-	tasks = Add(tasks, "buy milk")
-	tasks = Add(tasks, "write tests")
-	tasks = Add(tasks, "deploy")
+	tasks = Add(tasks, "buy milk", PriorityNone)
+	tasks = Add(tasks, "write tests", PriorityHigh)
+	tasks = Add(tasks, "deploy", PriorityNone)
 
 	if err := store.Save(tasks); err != nil {
 		t.Fatalf("save after add: %v", err)
@@ -593,5 +593,105 @@ func TestRoundTrip(t *testing.T) {
 	// verify remaining IDs
 	if tasks[0].ID != 2 || tasks[1].ID != 3 {
 		t.Errorf("remaining IDs = [%d, %d], want [2, 3]", tasks[0].ID, tasks[1].ID)
+	}
+}
+
+func TestValidPriority(t *testing.T) {
+	tests := []struct {
+		input string
+		want  Priority
+		ok    bool
+	}{
+		{"", PriorityNone, true},
+		{"low", PriorityLow, true},
+		{"medium", PriorityMedium, true},
+		{"high", PriorityHigh, true},
+		{"critical", "", false},
+		{"urgent", "", false},
+		{"HIGH", "", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			got, ok := ValidPriority(tt.input)
+			if ok != tt.ok {
+				t.Fatalf("ok = %v, want %v", ok, tt.ok)
+			}
+			if got != tt.want {
+				t.Errorf("priority = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestAddWithPriority(t *testing.T) {
+	tasks := Add(nil, "urgent thing", PriorityHigh)
+	if len(tasks) != 1 {
+		t.Fatalf("len = %d, want 1", len(tasks))
+	}
+	if tasks[0].Priority != PriorityHigh {
+		t.Errorf("priority = %q, want %q", tasks[0].Priority, PriorityHigh)
+	}
+}
+
+func TestAddWithoutPriority(t *testing.T) {
+	tasks := Add(nil, "normal thing", PriorityNone)
+	if len(tasks) != 1 {
+		t.Fatalf("len = %d, want 1", len(tasks))
+	}
+	if tasks[0].Priority != PriorityNone {
+		t.Errorf("priority = %q, want empty", tasks[0].Priority)
+	}
+}
+
+func TestPriorityJSONRoundTrip(t *testing.T) {
+	store := tempStore(t)
+	now := time.Now().Truncate(time.Second)
+
+	original := []Task{
+		{ID: 1, Title: "high task", Priority: PriorityHigh, CreatedAt: now},
+		{ID: 2, Title: "no priority", Priority: PriorityNone, CreatedAt: now},
+		{ID: 3, Title: "low task", Priority: PriorityLow, CreatedAt: now},
+	}
+
+	if err := store.Save(original); err != nil {
+		t.Fatalf("save: %v", err)
+	}
+
+	loaded, err := store.Load()
+	if err != nil {
+		t.Fatalf("load: %v", err)
+	}
+
+	if len(loaded) != len(original) {
+		t.Fatalf("expected %d tasks, got %d", len(original), len(loaded))
+	}
+
+	for i := range original {
+		if loaded[i].Priority != original[i].Priority {
+			t.Errorf("task %d: priority = %q, want %q", i, loaded[i].Priority, original[i].Priority)
+		}
+	}
+}
+
+func TestBackwardsCompatibility(t *testing.T) {
+	store := tempStore(t)
+
+	// simulate old-format JSON without priority field
+	data := []byte(`[{"id":1,"title":"old task","done":false,"created_at":"2025-01-15T10:00:00Z"}]`)
+	if err := os.WriteFile(store.Path, data, 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	tasks, err := store.Load()
+	if err != nil {
+		t.Fatalf("load: %v", err)
+	}
+
+	if len(tasks) != 1 {
+		t.Fatalf("expected 1 task, got %d", len(tasks))
+	}
+	if tasks[0].Priority != PriorityNone {
+		t.Errorf("priority = %q, want empty (backwards compatible)", tasks[0].Priority)
 	}
 }
