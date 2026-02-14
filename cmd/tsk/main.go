@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/zarldev/tsk/internal/color"
 	"github.com/zarldev/tsk/internal/config"
 	"github.com/zarldev/tsk/internal/task"
 )
@@ -32,15 +33,17 @@ func main() {
 		os.Exit(1)
 	}
 
+	c := color.New(cfg.Color.Enabled)
+
 	switch os.Args[1] {
 	case "add":
-		cmdAdd(store)
+		cmdAdd(store, c)
 	case "list":
-		cmdList(store)
+		cmdList(store, c)
 	case "done":
-		cmdDone(store)
+		cmdDone(store, c)
 	case "rm":
-		cmdRm(store)
+		cmdRm(store, c)
 	case "config":
 		cmdConfig(cfg)
 	case "version":
@@ -52,7 +55,7 @@ func main() {
 	}
 }
 
-func cmdAdd(store task.Store) {
+func cmdAdd(store task.Store, c color.Palette) {
 	if len(os.Args) < 3 {
 		fmt.Fprintln(os.Stderr, "usage: tsk add <title>")
 		os.Exit(1)
@@ -71,10 +74,10 @@ func cmdAdd(store task.Store) {
 	}
 
 	t := tasks[len(tasks)-1]
-	fmt.Printf("added task %d: %s\n", t.ID, t.Title)
+	fmt.Printf("added task %s: %s\n", c.BoldCyan(strconv.Itoa(t.ID)), t.Title)
 }
 
-func cmdList(store task.Store) {
+func cmdList(store task.Store, c color.Palette) {
 	f := task.FilterAll
 	if len(os.Args) > 2 {
 		switch os.Args[2] {
@@ -100,15 +103,20 @@ func cmdList(store task.Store) {
 	}
 
 	for _, t := range filtered {
-		check := "[ ]"
+		id := c.BoldCyan(fmt.Sprintf("%3d", t.ID))
+		a := c.Dim(fmt.Sprintf("(%s)", age(t.CreatedAt)))
+
 		if t.Done {
-			check = "[x]"
+			check := c.Green("[x]")
+			title := c.DimStrikethrough(t.Title)
+			fmt.Printf("%s %s %s  %s\n", id, check, title, a)
+		} else {
+			fmt.Printf("%s [ ] %s  %s\n", id, t.Title, a)
 		}
-		fmt.Printf("%3d %s %s  (%s)\n", t.ID, check, t.Title, age(t.CreatedAt))
 	}
 }
 
-func cmdDone(store task.Store) {
+func cmdDone(store task.Store, c color.Palette) {
 	if len(os.Args) < 3 {
 		fmt.Fprintln(os.Stderr, "usage: tsk done <id>")
 		os.Exit(1)
@@ -133,10 +141,10 @@ func cmdDone(store task.Store) {
 		fatal(err)
 	}
 
-	fmt.Printf("task %d marked done\n", id)
+	fmt.Printf("task %s marked %s\n", c.BoldCyan(strconv.Itoa(id)), c.Green("done"))
 }
 
-func cmdRm(store task.Store) {
+func cmdRm(store task.Store, c color.Palette) {
 	if len(os.Args) < 3 {
 		fmt.Fprintln(os.Stderr, "usage: tsk rm <id>")
 		os.Exit(1)
@@ -162,7 +170,7 @@ func cmdRm(store task.Store) {
 		fatal(err)
 	}
 
-	fmt.Printf("task %d removed\n", id)
+	fmt.Printf("task %s removed\n", c.BoldCyan(strconv.Itoa(id)))
 }
 
 func age(t time.Time) string {
