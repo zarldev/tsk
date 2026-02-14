@@ -43,6 +43,8 @@ tsk edit 1 "buy oat milk"      # rename task 1
 tsk rm 1                       # remove task 1
 tsk rm 2,4                     # remove multiple tasks
 tsk clear                      # remove all done tasks
+tsk export                     # export tasks as markdown
+tsk export --pending           # export only pending tasks
 tsk config                     # print current config
 tsk version                    # print version
 ```

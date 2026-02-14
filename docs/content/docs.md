@@ -6,7 +6,7 @@ title: "docs"
 
 - [demo](#demo)
 - [install](#install)
-- [commands](#commands) -- [show](#show) / [add](#add) / [list (ls)](#list) / [done](#done) / [edit](#edit) / [rm](#rm) / [clear](#clear) / [config](#config) / [version](#version)
+- [commands](#commands) -- [show](#show) / [add](#add) / [list (ls)](#list) / [done](#done) / [edit](#edit) / [rm](#rm) / [clear](#clear) / [export](#export) / [config](#config) / [version](#version)
 - [priority](#priority)
 - [configuration](#configuration)
 - [storage](#storage)
@@ -244,6 +244,49 @@ no done tasks to clear
 ```
 
 this removes every task that has been marked done. pending tasks are left untouched. there is no confirmation prompt — use `tsk list --done` first to review what will be removed.
+
+### export
+
+export tasks as a markdown checklist, suitable for pasting into PRs, docs, or notes.
+
+```
+tsk export [--done|--pending]
+```
+
+export all tasks:
+
+```
+$ tsk export
+- [ ] buy milk
+- [ ] urgent fix (high)
+- [x] write tests
+```
+
+export only pending tasks:
+
+```
+$ tsk export --pending
+- [ ] buy milk
+- [ ] urgent fix (high)
+```
+
+export only completed tasks:
+
+```
+$ tsk export --done
+- [x] write tests
+```
+
+tasks with a priority show it in parentheses after the title. tasks without a priority show the title only.
+
+output goes to stdout with no colors, so it can be piped or redirected:
+
+```
+$ tsk export --pending > todo.md
+$ tsk export | pbcopy
+```
+
+if no tasks match the filter, the output is empty (no "no tasks" message). this is intentional so `tsk export > file.md` produces an empty file rather than one containing a status message.
 
 ### config
 
