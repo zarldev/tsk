@@ -1,0 +1,11 @@
+baseURL = "https://zarldev.github.io/tsk/"
+title = "tsk"
+theme = "hugo-book"
+
+enableGitInfo = false
+
+[params]
+  BookTheme = "auto"
+  BookToC = true
+  BookSection = "docs"
+  BookRepo = "https://github.com/zarldev/tsk"
