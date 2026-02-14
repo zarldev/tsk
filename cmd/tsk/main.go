@@ -9,6 +9,8 @@ import (
 	"github.com/zarldev/tsk/internal/task"
 )
 
+var version = "dev"
+
 func main() {
 	if len(os.Args) < 2 {
 		usage()
@@ -29,6 +31,8 @@ func main() {
 		cmdDone(path)
 	case "rm":
 		cmdRm(path)
+	case "version":
+		fmt.Printf("tsk %s\n", version)
 	default:
 		fmt.Fprintf(os.Stderr, "unknown command: %s\n", os.Args[1])
 		usage()
@@ -171,10 +175,11 @@ func usage() {
 	fmt.Fprintln(os.Stderr, `usage: tsk <command> [args]
 
 commands:
-  add <title>       add a new task
+  add <title>              add a new task
   list [--done|--pending]  list tasks
-  done <id>         mark a task as done
-  rm <id>           remove a task`)
+  done <id>                mark a task as done
+  rm <id>                  remove a task
+  version                  print version`)
 }
 
 func fatal(err error) {
