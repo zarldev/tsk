@@ -6,7 +6,8 @@ title: "docs"
 
 - [demo](#demo)
 - [install](#install)
-- [commands](#commands) -- [add](#add) / [list](#list) / [done](#done) / [rm](#rm)
+- [commands](#commands) -- [add](#add) / [list](#list) / [done](#done) / [rm](#rm) / [config](#config) / [version](#version)
+- [configuration](#configuration)
 - [storage](#storage)
 
 ---
@@ -32,6 +33,8 @@ no tasks
 $ tsk rm 1
 task 1 removed
 ```
+
+output is colored in the terminal — task IDs in cyan, done checkmarks in green, completed tasks dimmed. disable with `NO_COLOR=1` or in config.
 
 ---
 
@@ -145,17 +148,66 @@ task 1 removed
 
 this deletes the task from storage entirely. there is no undo.
 
+### config
+
+print the current resolved configuration in TOML format.
+
+```
+tsk config
+```
+
+pipe to create a config file:
+
+```
+$ tsk config > ~/.config/tsk/config.toml
+```
+
+### version
+
+print the version.
+
+```
+$ tsk version
+tsk v0.2.0
+```
+
+---
+
+## configuration
+
+tsk reads configuration from `~/.config/tsk/config.toml`. if the file does not exist, sensible defaults are used — tsk works out of the box with no configuration.
+
+generate a default config file:
+
+    $ mkdir -p ~/.config/tsk
+    $ tsk config > ~/.config/tsk/config.toml
+
+### color
+
+    [color]
+    enabled = "auto"  # "auto", "always", "never"
+
+- `auto` — colors when stdout is a terminal (default)
+- `always` — colors even when piped (useful for `less -R`)
+- `never` — no colors
+
+tsk respects the `NO_COLOR` environment variable (https://no-color.org). if set, colors are disabled regardless of config.
+
 ---
 
 ## storage
 
-tasks are stored in a single JSON file at:
+tsk supports pluggable storage backends. configure the backend in `~/.config/tsk/config.toml` under the `[storage]` section.
 
-```
-~/.tasks.json
-```
+### file (default)
 
-this file is created automatically the first time you add a task. if the file does not exist, `tsk` treats it as an empty task list.
+tasks are stored in a single JSON file.
+
+    [storage]
+    type = "file"
+    path = "~/.tasks.json"
+
+the file is created automatically the first time you add a task. if the file does not exist, `tsk` treats it as an empty task list.
 
 the file contains a JSON array of task objects:
 
@@ -181,33 +233,25 @@ the file contains a JSON array of task objects:
 
 because the storage is plain JSON, you can back it up, sync it across machines, edit it manually, or version control it.
 
----
-
-## storage backends
-
-### file (default)
-
-tasks stored in `~/.tasks.json`. configure with:
-
-```
-[storage]
-type = "file"
-path = "~/.tasks.json"
-```
-
 ### github gist
 
-sync tasks across machines via a private gist. requires a GitHub token with `gist` scope.
+sync tasks across machines via a private gist. requires a GitHub personal access token with `gist` scope.
 
-```
-[storage]
-type = "gist"
-gist_token = "ghp_..."
-gist_id = ""  # created on first run
-```
+    [storage]
+    type = "gist"
+    gist_token = "ghp_..."
+    gist_id = ""
 
 or set the token via environment variable:
 
 ```
 export TSK_GIST_TOKEN=ghp_...
 ```
+
+the env var takes precedence over the config file value.
+
+on first run with an empty `gist_id`, tsk creates a new private gist and prints the ID. add it to your config to reuse the same gist:
+
+    [storage]
+    type = "gist"
+    gist_id = "abc123..."
