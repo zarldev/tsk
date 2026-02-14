@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} - {{ .Site.Title }}{{ end }}</title>
+  <link rel="stylesheet" href="/tsk/style.css">
+</head>
+<body>
+  <nav>
+    <a href="/tsk/" class="nav-title">tsk</a>
+    <a href="/tsk/docs/">docs</a>
+  </nav>
+  <main>
+    {{ block "main" . }}{{ end }}
+  </main>
+  <footer>
+    <span class="prompt">$</span> # built with hugo &mdash; <a href="https://github.com/zarldev/tsk">source</a>
+  </footer>
+</body>
+</html>

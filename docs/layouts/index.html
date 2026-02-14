@@ -1,0 +1,56 @@
+{{ define "main" }}
+<section class="hero">
+  <pre class="ascii-title" aria-hidden="true">
+ _        _
+| |_ ___ | | __
+| __/ __|| |/ /
+| |_\__ \|   &lt;
+ \__|___/|_|\_\</pre>
+  <h1 class="sr-only">tsk</h1>
+  <p class="tagline">task tracking for people who live in the terminal</p>
+  <div class="install-block">
+    <div class="terminal-window">
+      <div class="terminal-chrome"><span></span><span></span><span></span></div>
+      <pre><code><span class="prompt">$</span> go install github.com/zarldev/tsk/cmd/tsk@latest</code></pre>
+    </div>
+  </div>
+</section>
+
+<section class="demo">
+  <h2><span class="prompt">$</span> cat demo.txt</h2>
+  <div class="terminal-window">
+    <div class="terminal-chrome"><span></span><span></span><span></span></div>
+    <pre><code><span class="prompt">$</span> tsk add "buy milk"
+added task 1: buy milk
+
+<span class="prompt">$</span> tsk list
+  1 [ ] buy milk  (just now)
+
+<span class="prompt">$</span> tsk done 1
+task 1 marked done
+
+<span class="prompt">$</span> tsk list
+  1 [x] buy milk  (2m ago)
+
+<span class="prompt">$</span> tsk list --pending
+no tasks
+
+<span class="prompt">$</span> tsk rm 1
+task 1 removed</code></pre>
+  </div>
+</section>
+
+<section class="features">
+  <h2><span class="prompt">$</span> tsk --features</h2>
+  <ul>
+    <li><strong>instant</strong> &mdash; add, complete, and remove tasks in seconds. no workflow to learn.</li>
+    <li><strong>zero dependencies</strong> &mdash; single Go binary. no database, no config file, no runtime.</li>
+    <li><strong>plain json</strong> &mdash; tasks live in <code>~/.tasks.json</code>. read them, script them, back them up.</li>
+    <li><strong>filtered views</strong> &mdash; list everything, or show only pending or completed tasks.</li>
+  </ul>
+</section>
+
+<section class="docs-link">
+  <p><span class="prompt">$</span> man tsk &rarr; <a href="/tsk/docs/">read the docs</a></p>
+</section>
+{{ end }}
