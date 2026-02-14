@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/zarlbot/tsk/internal/task"
+	"github.com/zarldev/tsk/internal/task"
 )
 
 func main() {
