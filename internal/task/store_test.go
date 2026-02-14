@@ -209,6 +209,96 @@ func TestDone(t *testing.T) {
 	}
 }
 
+func TestEdit(t *testing.T) {
+	now := time.Now()
+	completed := now.Add(-time.Hour)
+
+	tests := []struct {
+		name      string
+		tasks     []Task
+		id        int
+		title     string
+		wantErr   bool
+		wantTitle string
+	}{
+		{
+			name: "rename existing task",
+			tasks: []Task{
+				{ID: 1, Title: "buy milk", Done: false, CreatedAt: now},
+				{ID: 2, Title: "write code", Done: true, CreatedAt: now, CompletedAt: &completed},
+			},
+			id:        1,
+			title:     "buy oat milk",
+			wantErr:   false,
+			wantTitle: "buy oat milk",
+		},
+		{
+			name: "preserves other fields",
+			tasks: []Task{
+				{ID: 1, Title: "old title", Done: true, CreatedAt: now, CompletedAt: &completed},
+			},
+			id:        1,
+			title:     "new title",
+			wantErr:   false,
+			wantTitle: "new title",
+		},
+		{
+			name: "not found",
+			tasks: []Task{
+				{ID: 1, Title: "a"},
+			},
+			id:      99,
+			title:   "whatever",
+			wantErr: true,
+		},
+		{
+			name:    "empty list",
+			tasks:   nil,
+			id:      1,
+			title:   "whatever",
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := Edit(tt.tasks, tt.id, tt.title)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("err = %v, wantErr = %v", err, tt.wantErr)
+			}
+			if err != nil {
+				return
+			}
+
+			// find the edited task and verify
+			for _, tk := range tt.tasks {
+				if tk.ID == tt.id {
+					if tk.Title != tt.wantTitle {
+						t.Errorf("Title = %q, want %q", tk.Title, tt.wantTitle)
+					}
+				}
+			}
+		})
+	}
+
+	// verify other fields are preserved after edit
+	tasks := []Task{
+		{ID: 1, Title: "old", Done: true, CreatedAt: now, CompletedAt: &completed},
+	}
+	if err := Edit(tasks, 1, "new"); err != nil {
+		t.Fatalf("edit: %v", err)
+	}
+	if tasks[0].Done != true {
+		t.Error("Done should be preserved")
+	}
+	if !tasks[0].CreatedAt.Equal(now) {
+		t.Error("CreatedAt should be preserved")
+	}
+	if tasks[0].CompletedAt == nil || !tasks[0].CompletedAt.Equal(completed) {
+		t.Error("CompletedAt should be preserved")
+	}
+}
+
 func TestRemove(t *testing.T) {
 	tests := []struct {
 		name    string

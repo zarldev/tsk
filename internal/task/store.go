@@ -114,6 +114,18 @@ func Find(tasks []Task, id int) *Task {
 	return nil
 }
 
+// Edit changes the title of the task with the given ID.
+// Returns an error if the ID is not found.
+func Edit(tasks []Task, id int, title string) error {
+	for i := range tasks {
+		if tasks[i].ID == id {
+			tasks[i].Title = title
+			return nil
+		}
+	}
+	return fmt.Errorf("task %d: not found", id)
+}
+
 // Remove deletes the task with the given ID and returns the updated slice.
 // Returns an error if the ID is not found.
 func Remove(tasks []Task, id int) ([]Task, error) {

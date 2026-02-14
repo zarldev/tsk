@@ -52,6 +52,8 @@ func main() {
 		cmdList(store, c)
 	case "done":
 		cmdDone(store, c)
+	case "edit":
+		cmdEdit(store, c)
 	case "rm":
 		cmdRm(store, c)
 	case "clear":
@@ -200,6 +202,37 @@ func cmdDone(store task.Store, c color.Palette) {
 	}
 }
 
+func cmdEdit(store task.Store, c color.Palette) {
+	if len(os.Args) < 4 {
+		fmt.Fprintln(os.Stderr, "usage: tsk edit <id> <title>")
+		os.Exit(1)
+	}
+
+	id, err := strconv.Atoi(os.Args[2])
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "invalid id: %s\n", os.Args[2])
+		os.Exit(1)
+	}
+
+	title := os.Args[3]
+
+	tasks, err := store.Load()
+	if err != nil {
+		fatal(err)
+	}
+
+	if err := task.Edit(tasks, id, title); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+
+	if err := store.Save(tasks); err != nil {
+		fatal(err)
+	}
+
+	fmt.Printf("task %s updated: %s\n", c.BoldCyan(strconv.Itoa(id)), title)
+}
+
 func cmdRm(store task.Store, c color.Palette) {
 	if len(os.Args) < 3 {
 		fmt.Fprintln(os.Stderr, "usage: tsk rm <id>[,<id>,...]")
@@ -312,6 +345,7 @@ commands:
   add <title>                  add a new task
   list, ls [--done|--pending]  list tasks
   done <id>[,<id>,...]         mark tasks as done
+  edit <id> <title>            rename a task
   rm <id>[,<id>,...]           remove tasks
   clear                        remove all done tasks
   config                       show current configuration

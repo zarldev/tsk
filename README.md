@@ -38,6 +38,7 @@ tsk ls                   # same as list
 tsk 1                    # show task 1 details
 tsk done 1               # mark task 1 complete
 tsk done 1,3,5           # mark multiple tasks complete
+tsk edit 1 "buy oat milk"  # rename task 1
 tsk rm 1                 # remove task 1
 tsk rm 2,4               # remove multiple tasks
 tsk clear                # remove all done tasks
