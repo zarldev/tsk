@@ -6,7 +6,7 @@ title: "docs"
 
 - [demo](#demo)
 - [install](#install)
-- [commands](#commands) -- [show](#show) / [add](#add) / [list (ls)](#list) / [done](#done) / [rm](#rm) / [config](#config) / [version](#version)
+- [commands](#commands) -- [show](#show) / [add](#add) / [list (ls)](#list) / [done](#done) / [rm](#rm) / [clear](#clear) / [config](#config) / [version](#version)
 - [configuration](#configuration)
 - [storage](#storage)
 
@@ -184,6 +184,24 @@ task 4 removed
 ```
 
 this deletes the task from storage entirely. there is no undo. if an ID does not exist, `tsk` prints an error for that ID and continues with the rest.
+
+### clear
+
+remove all completed tasks in one operation.
+
+```
+tsk clear
+```
+
+```
+$ tsk clear
+cleared 3 done tasks
+
+$ tsk clear
+no done tasks to clear
+```
+
+this removes every task that has been marked done. pending tasks are left untouched. there is no confirmation prompt — use `tsk list --done` first to review what will be removed.
 
 ### config
 

@@ -336,6 +336,69 @@ func TestDoneCompletedAtRoundTrip(t *testing.T) {
 	}
 }
 
+func TestClearDone(t *testing.T) {
+	tests := []struct {
+		name          string
+		tasks         []Task
+		wantRemoved   int
+		wantRemaining int
+	}{
+		{
+			name: "mix of done and pending",
+			tasks: []Task{
+				{ID: 1, Title: "done1", Done: true},
+				{ID: 2, Title: "pending1", Done: false},
+				{ID: 3, Title: "done2", Done: true},
+				{ID: 4, Title: "pending2", Done: false},
+			},
+			wantRemoved:   2,
+			wantRemaining: 2,
+		},
+		{
+			name: "no done tasks",
+			tasks: []Task{
+				{ID: 1, Title: "pending1", Done: false},
+				{ID: 2, Title: "pending2", Done: false},
+			},
+			wantRemoved:   0,
+			wantRemaining: 2,
+		},
+		{
+			name: "all done",
+			tasks: []Task{
+				{ID: 1, Title: "done1", Done: true},
+				{ID: 2, Title: "done2", Done: true},
+				{ID: 3, Title: "done3", Done: true},
+			},
+			wantRemoved:   3,
+			wantRemaining: 0,
+		},
+		{
+			name:          "empty slice",
+			tasks:         nil,
+			wantRemoved:   0,
+			wantRemaining: 0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			removed, remaining := ClearDone(tt.tasks)
+			if removed != tt.wantRemoved {
+				t.Errorf("removed = %d, want %d", removed, tt.wantRemoved)
+			}
+			if len(remaining) != tt.wantRemaining {
+				t.Errorf("remaining len = %d, want %d", len(remaining), tt.wantRemaining)
+			}
+			for _, tk := range remaining {
+				if tk.Done {
+					t.Errorf("task %d should not be done in remaining", tk.ID)
+				}
+			}
+		})
+	}
+}
+
 func TestFind(t *testing.T) {
 	tasks := []Task{
 		{ID: 1, Title: "first"},
