@@ -28,6 +28,15 @@ func main() {
 	switch cfg.Storage.Type {
 	case "file":
 		store = task.NewFileStore(cfg.Storage.Path)
+	case "gist":
+		token := cfg.Storage.GistToken
+		if env := os.Getenv("TSK_GIST_TOKEN"); env != "" {
+			token = env
+		}
+		if token == "" {
+			fatal(fmt.Errorf("gist storage requires gist_token in config or TSK_GIST_TOKEN env var"))
+		}
+		store = task.NewGistStore(token, cfg.Storage.GistID)
 	default:
 		fmt.Fprintf(os.Stderr, "unknown storage type: %s\n", cfg.Storage.Type)
 		os.Exit(1)

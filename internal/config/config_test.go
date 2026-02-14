@@ -368,3 +368,101 @@ func TestPath(t *testing.T) {
 		t.Errorf("Path() = %q, want suffix .config/tsk/config.toml", p)
 	}
 }
+
+func TestLoadGistConfig(t *testing.T) {
+	content := `[storage]
+type = "gist"
+gist_token = "ghp_abc123"
+gist_id = "deadbeef"
+`
+	p := writeConfig(t, content)
+	cfg, err := LoadFrom(p)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if cfg.Storage.Type != "gist" {
+		t.Errorf("Storage.Type = %q, want %q", cfg.Storage.Type, "gist")
+	}
+	if cfg.Storage.GistToken != "ghp_abc123" {
+		t.Errorf("Storage.GistToken = %q, want %q", cfg.Storage.GistToken, "ghp_abc123")
+	}
+	if cfg.Storage.GistID != "deadbeef" {
+		t.Errorf("Storage.GistID = %q, want %q", cfg.Storage.GistID, "deadbeef")
+	}
+}
+
+func TestLoadGistConfigEmptyID(t *testing.T) {
+	content := `[storage]
+type = "gist"
+gist_token = "ghp_abc123"
+gist_id = ""
+`
+	p := writeConfig(t, content)
+	cfg, err := LoadFrom(p)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if cfg.Storage.GistToken != "ghp_abc123" {
+		t.Errorf("Storage.GistToken = %q, want %q", cfg.Storage.GistToken, "ghp_abc123")
+	}
+	if cfg.Storage.GistID != "" {
+		t.Errorf("Storage.GistID = %q, want empty", cfg.Storage.GistID)
+	}
+}
+
+func TestConfigStringGistRoundTrip(t *testing.T) {
+	original := Config{
+		Color: ColorConfig{Enabled: "auto"},
+		Storage: StorageConfig{
+			Type:      "gist",
+			Path:      "/unused",
+			GistToken: "ghp_roundtrip",
+			GistID:    "gist123",
+		},
+	}
+
+	p := writeConfig(t, original.String())
+	loaded, err := LoadFrom(p)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if loaded.Storage.GistToken != original.Storage.GistToken {
+		t.Errorf("GistToken = %q, want %q", loaded.Storage.GistToken, original.Storage.GistToken)
+	}
+	if loaded.Storage.GistID != original.Storage.GistID {
+		t.Errorf("GistID = %q, want %q", loaded.Storage.GistID, original.Storage.GistID)
+	}
+}
+
+func TestConfigStringContainsGistFields(t *testing.T) {
+	cfg := Config{
+		Color: ColorConfig{Enabled: "auto"},
+		Storage: StorageConfig{
+			Type:      "gist",
+			GistToken: "ghp_test",
+			GistID:    "abc123",
+		},
+	}
+
+	s := cfg.String()
+
+	if !strings.Contains(s, `gist_token = "ghp_test"`) {
+		t.Error("missing gist_token in String() output")
+	}
+	if !strings.Contains(s, `gist_id = "abc123"`) {
+		t.Error("missing gist_id in String() output")
+	}
+}
+
+func TestDefaultConfigGistFieldsEmpty(t *testing.T) {
+	cfg := DefaultConfig()
+	if cfg.Storage.GistToken != "" {
+		t.Errorf("GistToken = %q, want empty", cfg.Storage.GistToken)
+	}
+	if cfg.Storage.GistID != "" {
+		t.Errorf("GistID = %q, want empty", cfg.Storage.GistID)
+	}
+}
