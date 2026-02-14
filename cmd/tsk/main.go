@@ -23,17 +23,24 @@ func main() {
 		fatal(err)
 	}
 
-	path := cfg.Storage.Path
+	var store task.Store
+	switch cfg.Storage.Type {
+	case "file":
+		store = task.NewFileStore(cfg.Storage.Path)
+	default:
+		fmt.Fprintf(os.Stderr, "unknown storage type: %s\n", cfg.Storage.Type)
+		os.Exit(1)
+	}
 
 	switch os.Args[1] {
 	case "add":
-		cmdAdd(path)
+		cmdAdd(store)
 	case "list":
-		cmdList(path)
+		cmdList(store)
 	case "done":
-		cmdDone(path)
+		cmdDone(store)
 	case "rm":
-		cmdRm(path)
+		cmdRm(store)
 	case "config":
 		cmdConfig(cfg)
 	case "version":
@@ -45,13 +52,13 @@ func main() {
 	}
 }
 
-func cmdAdd(path string) {
+func cmdAdd(store task.Store) {
 	if len(os.Args) < 3 {
 		fmt.Fprintln(os.Stderr, "usage: tsk add <title>")
 		os.Exit(1)
 	}
 
-	tasks, err := task.Load(path)
+	tasks, err := store.Load()
 	if err != nil {
 		fatal(err)
 	}
@@ -59,7 +66,7 @@ func cmdAdd(path string) {
 	title := os.Args[2]
 	tasks = task.Add(tasks, title)
 
-	if err := task.Save(path, tasks); err != nil {
+	if err := store.Save(tasks); err != nil {
 		fatal(err)
 	}
 
@@ -67,7 +74,7 @@ func cmdAdd(path string) {
 	fmt.Printf("added task %d: %s\n", t.ID, t.Title)
 }
 
-func cmdList(path string) {
+func cmdList(store task.Store) {
 	f := task.FilterAll
 	if len(os.Args) > 2 {
 		switch os.Args[2] {
@@ -81,7 +88,7 @@ func cmdList(path string) {
 		}
 	}
 
-	tasks, err := task.Load(path)
+	tasks, err := store.Load()
 	if err != nil {
 		fatal(err)
 	}
@@ -101,7 +108,7 @@ func cmdList(path string) {
 	}
 }
 
-func cmdDone(path string) {
+func cmdDone(store task.Store) {
 	if len(os.Args) < 3 {
 		fmt.Fprintln(os.Stderr, "usage: tsk done <id>")
 		os.Exit(1)
@@ -113,7 +120,7 @@ func cmdDone(path string) {
 		os.Exit(1)
 	}
 
-	tasks, err := task.Load(path)
+	tasks, err := store.Load()
 	if err != nil {
 		fatal(err)
 	}
@@ -122,14 +129,14 @@ func cmdDone(path string) {
 		fatal(err)
 	}
 
-	if err := task.Save(path, tasks); err != nil {
+	if err := store.Save(tasks); err != nil {
 		fatal(err)
 	}
 
 	fmt.Printf("task %d marked done\n", id)
 }
 
-func cmdRm(path string) {
+func cmdRm(store task.Store) {
 	if len(os.Args) < 3 {
 		fmt.Fprintln(os.Stderr, "usage: tsk rm <id>")
 		os.Exit(1)
@@ -141,7 +148,7 @@ func cmdRm(path string) {
 		os.Exit(1)
 	}
 
-	tasks, err := task.Load(path)
+	tasks, err := store.Load()
 	if err != nil {
 		fatal(err)
 	}
@@ -151,7 +158,7 @@ func cmdRm(path string) {
 		fatal(err)
 	}
 
-	if err := task.Save(path, tasks); err != nil {
+	if err := store.Save(tasks); err != nil {
 		fatal(err)
 	}
 

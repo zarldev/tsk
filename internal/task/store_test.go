@@ -7,13 +7,17 @@ import (
 	"time"
 )
 
-func tempPath(t *testing.T) string {
+// compile-time check: FileStore implements Store
+var _ Store = (*FileStore)(nil)
+
+func tempStore(t *testing.T) *FileStore {
 	t.Helper()
-	return filepath.Join(t.TempDir(), "tasks.json")
+	return NewFileStore(filepath.Join(t.TempDir(), "tasks.json"))
 }
 
 func TestLoadNonExistent(t *testing.T) {
-	tasks, err := Load(filepath.Join(t.TempDir(), "nope.json"))
+	store := NewFileStore(filepath.Join(t.TempDir(), "nope.json"))
+	tasks, err := store.Load()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -23,12 +27,12 @@ func TestLoadNonExistent(t *testing.T) {
 }
 
 func TestLoadEmptyFile(t *testing.T) {
-	p := tempPath(t)
-	if err := os.WriteFile(p, []byte(""), 0644); err != nil {
+	store := tempStore(t)
+	if err := os.WriteFile(store.Path, []byte(""), 0644); err != nil {
 		t.Fatal(err)
 	}
 
-	tasks, err := Load(p)
+	tasks, err := store.Load()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -38,7 +42,7 @@ func TestLoadEmptyFile(t *testing.T) {
 }
 
 func TestSaveAndLoad(t *testing.T) {
-	p := tempPath(t)
+	store := tempStore(t)
 	now := time.Now().Truncate(time.Second)
 
 	original := []Task{
@@ -46,11 +50,11 @@ func TestSaveAndLoad(t *testing.T) {
 		{ID: 2, Title: "write code", Done: true, CreatedAt: now},
 	}
 
-	if err := Save(p, original); err != nil {
+	if err := store.Save(original); err != nil {
 		t.Fatalf("save: %v", err)
 	}
 
-	loaded, err := Load(p)
+	loaded, err := store.Load()
 	if err != nil {
 		t.Fatalf("load: %v", err)
 	}
@@ -274,10 +278,10 @@ func TestList(t *testing.T) {
 }
 
 func TestRoundTrip(t *testing.T) {
-	p := tempPath(t)
+	store := tempStore(t)
 
 	// start empty
-	tasks, err := Load(p)
+	tasks, err := store.Load()
 	if err != nil {
 		t.Fatalf("initial load: %v", err)
 	}
@@ -287,12 +291,12 @@ func TestRoundTrip(t *testing.T) {
 	tasks = Add(tasks, "write tests")
 	tasks = Add(tasks, "deploy")
 
-	if err := Save(p, tasks); err != nil {
+	if err := store.Save(tasks); err != nil {
 		t.Fatalf("save after add: %v", err)
 	}
 
 	// reload and mark done
-	tasks, err = Load(p)
+	tasks, err = store.Load()
 	if err != nil {
 		t.Fatalf("load after add: %v", err)
 	}
@@ -303,12 +307,12 @@ func TestRoundTrip(t *testing.T) {
 	if err := Done(tasks, 2); err != nil {
 		t.Fatalf("done: %v", err)
 	}
-	if err := Save(p, tasks); err != nil {
+	if err := store.Save(tasks); err != nil {
 		t.Fatalf("save after done: %v", err)
 	}
 
 	// reload and remove
-	tasks, err = Load(p)
+	tasks, err = store.Load()
 	if err != nil {
 		t.Fatalf("load after done: %v", err)
 	}
@@ -320,12 +324,12 @@ func TestRoundTrip(t *testing.T) {
 	if err != nil {
 		t.Fatalf("remove: %v", err)
 	}
-	if err := Save(p, tasks); err != nil {
+	if err := store.Save(tasks); err != nil {
 		t.Fatalf("save after remove: %v", err)
 	}
 
 	// final reload
-	tasks, err = Load(p)
+	tasks, err = store.Load()
 	if err != nil {
 		t.Fatalf("final load: %v", err)
 	}

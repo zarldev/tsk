@@ -9,24 +9,31 @@ import (
 	"time"
 )
 
-// DefaultPath returns the default storage path (~/.tasks.json).
-func DefaultPath() (string, error) {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return "", fmt.Errorf("user home dir: %w", err)
-	}
-	return filepath.Join(home, ".tasks.json"), nil
+// Store abstracts task persistence, enabling pluggable backends.
+type Store interface {
+	Load() ([]Task, error)
+	Save([]Task) error
 }
 
-// Load reads tasks from the given JSON file.
+// FileStore persists tasks as JSON in a local file.
+type FileStore struct {
+	Path string
+}
+
+// NewFileStore returns a FileStore that reads/writes the given path.
+func NewFileStore(path string) *FileStore {
+	return &FileStore{Path: path}
+}
+
+// Load reads tasks from the JSON file.
 // Returns an empty slice if the file does not exist.
-func Load(path string) ([]Task, error) {
-	data, err := os.ReadFile(path)
+func (s *FileStore) Load() ([]Task, error) {
+	data, err := os.ReadFile(s.Path)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			return nil, nil
 		}
-		return nil, fmt.Errorf("read %s: %w", path, err)
+		return nil, fmt.Errorf("read %s: %w", s.Path, err)
 	}
 
 	if len(data) == 0 {
@@ -40,16 +47,25 @@ func Load(path string) ([]Task, error) {
 	return tasks, nil
 }
 
-// Save writes tasks to the given JSON file.
-func Save(path string, tasks []Task) error {
+// Save writes tasks to the JSON file.
+func (s *FileStore) Save(tasks []Task) error {
 	data, err := json.MarshalIndent(tasks, "", "  ")
 	if err != nil {
 		return fmt.Errorf("marshal tasks: %w", err)
 	}
-	if err := os.WriteFile(path, data, 0644); err != nil {
-		return fmt.Errorf("write %s: %w", path, err)
+	if err := os.WriteFile(s.Path, data, 0644); err != nil {
+		return fmt.Errorf("write %s: %w", s.Path, err)
 	}
 	return nil
+}
+
+// DefaultPath returns the default storage path (~/.tasks.json).
+func DefaultPath() (string, error) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", fmt.Errorf("user home dir: %w", err)
+	}
+	return filepath.Join(home, ".tasks.json"), nil
 }
 
 // nextID returns the next auto-incrementing ID.
